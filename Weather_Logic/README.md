@@ -65,7 +65,7 @@ $$\min_{w} \sum_{i=1}^{N} \left(y_i - X_i w\right)^2 + \alpha \|w\|_2^2 \quad (\
 Training runs analytically in milliseconds and guarantees numerical stability.
 
 #### 4. Recursive Multi-Step Horizon Rollout
-For future hours $h \in [1, 72]$:
+For future hours $h \in [1, 168]$ (Next 7 Days):
 1. The model computes $[\text{hour\_sin}, \text{hour\_cos}]$.
 2. Retrieves $[y(t-1), y(t-2), y(t-24)]$ from either historical data or previously generated predictions.
 3. Predicts $\hat{y}(t)$ and applies physical domain constraints:
@@ -79,7 +79,7 @@ For future hours $h \in [1, 72]$:
 1. **No Synoptic Atmospheric Physics:** The statistical model has no sensor awareness of incoming air masses, barometric pressure gradients, storm depressions, or cloud cover dynamics.
 2. **Zero Seasonal Context:** 10 days represents less than 3% of an annual climate cycle, rendering the model incapable of detecting seasonal shifts (e.g., transition from summer to autumn).
 3. **Recency Bias:** Any atypical weather event (such as a temporary heatwave or persistent rain) in the past 10 days will disproportionately bias future projections.
-4. **Compounding Uncertainty in Multi-Step Rollout:** As predictions are recursively generated out to 72 hours (Day 3), feeding synthetic outputs back as lagged inputs causes error accumulation and dampening toward the 10-day mean.
+4. **Compounding Uncertainty in Multi-Step Rollout:** As predictions are recursively generated out to 168 hours (Day 7), feeding synthetic outputs back as lagged inputs causes error accumulation and dampening toward the 10-day mean.
 
 ---
 

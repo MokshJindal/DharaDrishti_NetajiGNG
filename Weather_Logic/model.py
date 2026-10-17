@@ -27,7 +27,7 @@ class LightweightWeatherPredictor:
         "No Synoptic Physics: The model is purely statistical and cannot detect barometric pressure changes, cold/warm fronts, or cloud cover.",
         "Zero Seasonal Context: 10 days represents less than 3% of an annual climate cycle, preventing detection of seasonal shifts.",
         "Recency Bias: Any atypical heatwave, unseasonal storm, or stagnation in the past 10 days will disproportionately skew future projections.",
-        "Compounding Multi-step Uncertainty: As recursive predictions are generated for 72 hours (Day 3), feeding predicted values back as lagged inputs causes error accumulation.",
+        "Compounding Multi-step Uncertainty: As recursive predictions are generated for 168 hours (7 Days), feeding predicted values back as lagged inputs causes error accumulation toward the historical mean.",
     ]
 
     def __init__(self, ridge_alpha: float = 1.0):
@@ -79,9 +79,9 @@ class LightweightWeatherPredictor:
 
         return self
 
-    def predict_future(self, horizon_hours: int = 72) -> pd.DataFrame:
+    def predict_future(self, horizon_hours: int = 168) -> pd.DataFrame:
         """
-        Recursively predicts the next `horizon_hours` hourly values for temp, humidity, and wind.
+        Recursively predicts the next `horizon_hours` hourly values for temp, humidity, and wind (default 168 hours = 7 days).
         """
         if not self.models:
             raise RuntimeError("Model has not been trained yet. Call fit() first.")

@@ -79,9 +79,9 @@ class TestWeatherPredictorModel(unittest.TestCase):
         self.assertIn("humidity", predictor.models)
         self.assertIn("wind_speed", predictor.models)
 
-        # Predict 72 hours (3 days)
-        forecast_df = predictor.predict_future(horizon_hours=72)
-        self.assertEqual(len(forecast_df), 72)
+        # Predict 168 hours (7 days)
+        forecast_df = predictor.predict_future(horizon_hours=168)
+        self.assertEqual(len(forecast_df), 168)
         self.assertListEqual(list(forecast_df.columns), ["time", "temperature", "humidity", "wind_speed"])
 
         # Boundary checks
@@ -92,9 +92,12 @@ class TestWeatherPredictorModel(unittest.TestCase):
     def test_forecast_summary_metrics(self):
         predictor = LightweightWeatherPredictor(ridge_alpha=1.0)
         predictor.fit(self.df)
-        forecast_df = predictor.predict_future(horizon_hours=72)
+        forecast_df = predictor.predict_future(horizon_hours=168)
 
         summary_24 = predictor.summarize_forecast(forecast_df, 24)
+        summary_168 = predictor.summarize_forecast(forecast_df, 168)
+        self.assertIn("temperature", summary_24)
+        self.assertIn("mean", summary_168["temperature"])
         self.assertIn("temperature", summary_24)
         self.assertIn("mean", summary_24["temperature"])
         self.assertIn("min", summary_24["temperature"])

@@ -84,6 +84,7 @@ class WeatherAPIClient:
             "longitude": longitude,
             "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
             "hourly": "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,precipitation_probability,cloud_cover,weather_code",
+            "forecast_days": 7,
             "timezone": self.config.timezone,
         }
 

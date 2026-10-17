@@ -136,15 +136,18 @@ def display_irrigation_advisory(advisory: IrrigationAdvisoryResult, urea_applied
 def align_and_compare(
     pred_df: pd.DataFrame, api_forecast_df: pd.DataFrame
 ) -> Dict[str, Any]:
-    """Computes summary metrics for 24h (+1 day) and 72h (+3 days) windows."""
+    """Computes summary metrics for 24h (+1 day), 72h (+3 days), and 168h (+7 days) windows."""
     m_1d = LightweightWeatherPredictor.summarize_forecast(pred_df, 24)
     a_1d = LightweightWeatherPredictor.summarize_forecast(api_forecast_df, 24)
     m_3d = LightweightWeatherPredictor.summarize_forecast(pred_df, 72)
     a_3d = LightweightWeatherPredictor.summarize_forecast(api_forecast_df, 72)
+    m_7d = LightweightWeatherPredictor.summarize_forecast(pred_df, 168)
+    a_7d = LightweightWeatherPredictor.summarize_forecast(api_forecast_df, 168)
 
     return {
         "1_day": {"model": m_1d, "api": a_1d},
         "3_day": {"model": m_3d, "api": a_3d},
+        "7_day": {"model": m_7d, "api": a_7d},
     }
 
 
@@ -175,6 +178,7 @@ def format_comparison_table(comp: Dict[str, Any]) -> None:
     horizons = [
         ("Next 1-Day", "1_day"),
         ("Next 3-Days", "3_day"),
+        ("Next 7-Days", "7_day"),
     ]
 
     metrics = [
@@ -233,7 +237,7 @@ def main():
     # Step 2: Prediction Model Fitting
     predictor = LightweightWeatherPredictor(ridge_alpha=1.0)
     predictor.fit(historical_df)
-    pred_df = predictor.predict_future(horizon_hours=72)
+    pred_df = predictor.predict_future(horizon_hours=168)
 
     # Step 3: Comparative Evaluation
     comparison = align_and_compare(pred_df, api_forecast_df)
