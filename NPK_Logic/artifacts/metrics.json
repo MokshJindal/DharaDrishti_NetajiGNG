@@ -1,0 +1,911 @@
+{
+  "metadata": {
+    "model_version": "20261017T205324Z",
+    "trained_at_utc": "2026-10-17T20:53:24.064041+00:00",
+    "sklearn_version": "1.7.2",
+    "python_version": "3.13.9",
+    "dataset_sha256": "268441f4659cc316bfe2cc2db989525075821e6536b65d7009d9ea78d6f19553",
+    "n_training_rows": 150,
+    "classes": [
+      "Degraded/Critical",
+      "Healthy/Balanced",
+      "Nutrient Deficient"
+    ],
+    "model_fields": [
+      "nitrogen_kg_ha",
+      "phosphorus_kg_ha",
+      "potassium_kg_ha",
+      "ph",
+      "ec_ds_m",
+      "organic_carbon_pct",
+      "sulphur_ppm",
+      "zinc_ppm",
+      "iron_ppm",
+      "copper_ppm",
+      "manganese_ppm",
+      "boron_ppm"
+    ],
+    "numeric_model_fields": [
+      "nitrogen_kg_ha",
+      "phosphorus_kg_ha",
+      "potassium_kg_ha",
+      "ph",
+      "ec_ds_m",
+      "organic_carbon_pct",
+      "sulphur_ppm",
+      "zinc_ppm",
+      "iron_ppm",
+      "copper_ppm",
+      "manganese_ppm",
+      "boron_ppm"
+    ],
+    "classifier": "DecisionTreeClassifier",
+    "classifier_params": {
+      "max_depth": 4,
+      "min_samples_leaf": 3
+    },
+    "feature_set": "all_soil",
+    "engineered_features": true,
+    "calibration_method": "isotonic",
+    "confidence_reliable": true,
+    "calibration_summary": {
+      "cv_oof": {
+        "log_loss": 0.2226,
+        "brier": 0.1155,
+        "top_label_ece": 0.0635,
+        "oof_macro_f1": 0.8956
+      },
+      "holdout": {
+        "log_loss": 0.2588,
+        "brier": 0.1179,
+        "top_label_ece": 0.0441
+      }
+    },
+    "feature_ranges": {
+      "nitrogen_kg_ha": {
+        "min": 156.15,
+        "max": 598.17
+      },
+      "phosphorus_kg_ha": {
+        "min": 5.1,
+        "max": 44.89
+      },
+      "potassium_kg_ha": {
+        "min": 94.39,
+        "max": 449.17
+      },
+      "ph": {
+        "min": 5.51,
+        "max": 8.48
+      },
+      "ec_ds_m": {
+        "min": 0.12,
+        "max": 2.48
+      },
+      "organic_carbon_pct": {
+        "min": 0.2,
+        "max": 1.2
+      },
+      "sulphur_ppm": {
+        "min": 4.05,
+        "max": 24.99
+      },
+      "zinc_ppm": {
+        "min": 0.2,
+        "max": 1.99
+      },
+      "iron_ppm": {
+        "min": 2.51,
+        "max": 11.91
+      },
+      "copper_ppm": {
+        "min": 0.11,
+        "max": 1.49
+      },
+      "manganese_ppm": {
+        "min": 1.02,
+        "max": 6.97
+      },
+      "boron_ppm": {
+        "min": 0.1,
+        "max": 1.47
+      }
+    },
+    "quantile_grid": {
+      "nitrogen_kg_ha": [
+        156.15,
+        210.1175,
+        267.65250000000003,
+        327.445,
+        377.58500000000004,
+        436.6425,
+        489.85249999999996,
+        548.10625,
+        598.17
+      ],
+      "phosphorus_kg_ha": [
+        5.1,
+        9.24,
+        15.307500000000001,
+        20.7975,
+        26.065,
+        28.77625,
+        34.3175,
+        39.03,
+        44.89
+      ],
+      "potassium_kg_ha": [
+        94.39,
+        149.58625,
+        194.20250000000001,
+        232.7675,
+        273.14,
+        305.46625,
+        352.59749999999997,
+        387.80375,
+        449.17
+      ],
+      "ph": [
+        5.51,
+        5.82,
+        6.18,
+        6.66,
+        7.02,
+        7.4712499999999995,
+        7.77,
+        8.14,
+        8.48
+      ],
+      "ec_ds_m": [
+        0.12,
+        0.40249999999999997,
+        0.64,
+        0.99,
+        1.29,
+        1.63,
+        1.8975,
+        2.1574999999999998,
+        2.48
+      ],
+      "organic_carbon_pct": [
+        0.2,
+        0.31,
+        0.42,
+        0.54,
+        0.65,
+        0.8312499999999999,
+        0.9475,
+        1.07375,
+        1.2
+      ],
+      "sulphur_ppm": [
+        4.05,
+        6.9025,
+        11.147499999999999,
+        13.93375,
+        16.195,
+        18.575,
+        20.7625,
+        22.872500000000002,
+        24.99
+      ],
+      "zinc_ppm": [
+        0.2,
+        0.34249999999999997,
+        0.6325000000000001,
+        0.9,
+        1.13,
+        1.28,
+        1.6124999999999998,
+        1.7975,
+        1.99
+      ],
+      "iron_ppm": [
+        2.51,
+        3.705,
+        4.73,
+        6.61875,
+        7.8100000000000005,
+        8.79125,
+        9.835,
+        10.79875,
+        11.91
+      ],
+      "copper_ppm": [
+        0.11,
+        0.29625,
+        0.4525,
+        0.63875,
+        0.765,
+        0.92,
+        1.03,
+        1.27375,
+        1.49
+      ],
+      "manganese_ppm": [
+        1.02,
+        2.0349999999999997,
+        2.7874999999999996,
+        3.40875,
+        4.15,
+        4.665,
+        5.2375,
+        5.95875,
+        6.97
+      ],
+      "boron_ppm": [
+        0.1,
+        0.29625,
+        0.4225,
+        0.5762499999999999,
+        0.77,
+        0.93125,
+        1.0475,
+        1.26,
+        1.47
+      ]
+    },
+    "input_sensitivity": {
+      "nitrogen_kg_ha": 0.766266,
+      "phosphorus_kg_ha": 0.638635,
+      "potassium_kg_ha": 0.638635,
+      "ph": 0.927503,
+      "ec_ds_m": 0.927503,
+      "organic_carbon_pct": 0.766266,
+      "sulphur_ppm": 0.0,
+      "zinc_ppm": 0.0,
+      "iron_ppm": 0.0,
+      "copper_ppm": 0.0,
+      "manganese_ppm": 0.128959,
+      "boron_ppm": 0.0
+    },
+    "inactive_fields": [
+      "sulphur_ppm",
+      "zinc_ppm",
+      "iron_ppm",
+      "copper_ppm",
+      "boron_ppm"
+    ],
+    "fill_values": {
+      "nitrogen_kg_ha": 377.58500000000004,
+      "phosphorus_kg_ha": 26.065,
+      "potassium_kg_ha": 273.14,
+      "ph": 7.02,
+      "ec_ds_m": 1.29,
+      "organic_carbon_pct": 0.65,
+      "sulphur_ppm": 16.195,
+      "zinc_ppm": 1.13,
+      "iron_ppm": 7.8100000000000005,
+      "copper_ppm": 0.765,
+      "manganese_ppm": 4.15,
+      "boron_ppm": 0.77
+    },
+    "known_crops": [
+      "Cotton",
+      "Maize",
+      "Rice",
+      "Soybean",
+      "Sugarcane",
+      "Wheat"
+    ],
+    "label_to_risk": {
+      "Healthy/Balanced": "Low Risk",
+      "Nutrient Deficient": "High Risk",
+      "Degraded/Critical": "Critical Risk"
+    }
+  },
+  "data_audit": {
+    "file": "icar_soil_health_model_ready.csv",
+    "sha256": "268441f4659cc316bfe2cc2db989525075821e6536b65d7009d9ea78d6f19553",
+    "n_rows": 150,
+    "n_columns": 21,
+    "columns": {
+      "Sample_ID": "object",
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Nitrogen_N_kg_ha": "float64",
+      "Phosphorus_P_kg_ha": "float64",
+      "Potassium_K_kg_ha": "float64",
+      "Sulphur_S_ppm": "float64",
+      "Zinc_Zn_ppm": "float64",
+      "Iron_Fe_ppm": "float64",
+      "Copper_Cu_ppm": "float64",
+      "Manganese_Mn_ppm": "float64",
+      "Boron_B_ppm": "float64",
+      "pH": "float64",
+      "Electrical_Conductivity_dS_m": "float64",
+      "Organic_Carbon_Percent": "float64",
+      "Targeted_Crop": "object",
+      "Recommended_Urea_kg_acre": "int64",
+      "Recommended_DAP_kg_acre": "int64",
+      "Recommended_MOP_kg_acre": "int64",
+      "Soil_Health_Status": "object"
+    },
+    "missing_values": {
+      "Sample_ID": 0,
+      "District": 0,
+      "Latitude": 0,
+      "Longitude": 0,
+      "Nitrogen_N_kg_ha": 0,
+      "Phosphorus_P_kg_ha": 0,
+      "Potassium_K_kg_ha": 0,
+      "Sulphur_S_ppm": 0,
+      "Zinc_Zn_ppm": 0,
+      "Iron_Fe_ppm": 0,
+      "Copper_Cu_ppm": 0,
+      "Manganese_Mn_ppm": 0,
+      "Boron_B_ppm": 0,
+      "pH": 0,
+      "Electrical_Conductivity_dS_m": 0,
+      "Organic_Carbon_Percent": 0,
+      "Targeted_Crop": 0,
+      "Recommended_Urea_kg_acre": 0,
+      "Recommended_DAP_kg_acre": 0,
+      "Recommended_MOP_kg_acre": 0,
+      "Soil_Health_Status": 0
+    },
+    "duplicate_sample_ids": 0,
+    "duplicate_rows_excluding_id": 0,
+    "excluded_columns": {
+      "Sample_ID": "Row identifier; no agronomic meaning.",
+      "District": "Location proxy (5 Maharashtra districts only); would not generalise to other regions.",
+      "Latitude": "Location proxy; would not generalise and risks spatial leakage.",
+      "Longitude": "Location proxy; would not generalise and risks spatial leakage.",
+      "Recommended_Urea_kg_acre": "Target leakage: fertiliser recommendation derived FROM the soil test (step-function of N).",
+      "Recommended_DAP_kg_acre": "Target leakage: fertiliser recommendation derived FROM the soil test (step-function of P).",
+      "Recommended_MOP_kg_acre": "Target leakage: fertiliser recommendation derived FROM the soil test (step-function of K)."
+    },
+    "label_distribution": {
+      "Degraded/Critical": 75,
+      "Healthy/Balanced": 61,
+      "Nutrient Deficient": 14
+    },
+    "rows_dropped_invalid_label": 0,
+    "rows_dropped_missing_features": 0,
+    "numeric_summary": {
+      "nitrogen_kg_ha": {
+        "count": 150.0,
+        "mean": 380.629,
+        "std": 130.087,
+        "min": 156.15,
+        "25%": 267.653,
+        "50%": 377.585,
+        "75%": 489.852,
+        "max": 598.17
+      },
+      "phosphorus_kg_ha": {
+        "count": 150.0,
+        "mean": 24.999,
+        "std": 11.376,
+        "min": 5.1,
+        "25%": 15.308,
+        "50%": 26.065,
+        "75%": 34.318,
+        "max": 44.89
+      },
+      "potassium_kg_ha": {
+        "count": 150.0,
+        "mean": 270.217,
+        "std": 95.194,
+        "min": 94.39,
+        "25%": 194.203,
+        "50%": 273.14,
+        "75%": 352.597,
+        "max": 449.17
+      },
+      "ph": {
+        "count": 150.0,
+        "mean": 7.003,
+        "std": 0.9,
+        "min": 5.51,
+        "25%": 6.18,
+        "50%": 7.02,
+        "75%": 7.77,
+        "max": 8.48
+      },
+      "ec_ds_m": {
+        "count": 150.0,
+        "mean": 1.295,
+        "std": 0.707,
+        "min": 0.12,
+        "25%": 0.64,
+        "50%": 1.29,
+        "75%": 1.898,
+        "max": 2.48
+      },
+      "organic_carbon_pct": {
+        "count": 150.0,
+        "mean": 0.686,
+        "std": 0.301,
+        "min": 0.2,
+        "25%": 0.42,
+        "50%": 0.65,
+        "75%": 0.948,
+        "max": 1.2
+      },
+      "sulphur_ppm": {
+        "count": 150.0,
+        "mean": 15.582,
+        "std": 6.011,
+        "min": 4.05,
+        "25%": 11.147,
+        "50%": 16.195,
+        "75%": 20.762,
+        "max": 24.99
+      },
+      "zinc_ppm": {
+        "count": 150.0,
+        "mean": 1.095,
+        "std": 0.553,
+        "min": 0.2,
+        "25%": 0.633,
+        "50%": 1.13,
+        "75%": 1.612,
+        "max": 1.99
+      },
+      "iron_ppm": {
+        "count": 150.0,
+        "mean": 7.434,
+        "std": 2.834,
+        "min": 2.51,
+        "25%": 4.73,
+        "50%": 7.81,
+        "75%": 9.835,
+        "max": 11.91
+      },
+      "copper_ppm": {
+        "count": 150.0,
+        "mean": 0.775,
+        "std": 0.379,
+        "min": 0.11,
+        "25%": 0.452,
+        "50%": 0.765,
+        "75%": 1.03,
+        "max": 1.49
+      },
+      "manganese_ppm": {
+        "count": 150.0,
+        "mean": 4.032,
+        "std": 1.564,
+        "min": 1.02,
+        "25%": 2.787,
+        "50%": 4.15,
+        "75%": 5.238,
+        "max": 6.97
+      },
+      "boron_ppm": {
+        "count": 150.0,
+        "mean": 0.762,
+        "std": 0.387,
+        "min": 0.1,
+        "25%": 0.422,
+        "50%": 0.77,
+        "75%": 1.048,
+        "max": 1.47
+      }
+    },
+    "crop_distribution": {
+      "Cotton": 35,
+      "Maize": 28,
+      "Wheat": 28,
+      "Rice": 24,
+      "Soybean": 24,
+      "Sugarcane": 11
+    },
+    "label_by_crop": {
+      "Cotton": {
+        "Degraded/Critical": 15,
+        "Healthy/Balanced": 14,
+        "Nutrient Deficient": 6
+      },
+      "Maize": {
+        "Degraded/Critical": 15,
+        "Healthy/Balanced": 11,
+        "Nutrient Deficient": 2
+      },
+      "Rice": {
+        "Degraded/Critical": 12,
+        "Healthy/Balanced": 10,
+        "Nutrient Deficient": 2
+      },
+      "Soybean": {
+        "Degraded/Critical": 12,
+        "Healthy/Balanced": 9,
+        "Nutrient Deficient": 3
+      },
+      "Sugarcane": {
+        "Degraded/Critical": 6,
+        "Healthy/Balanced": 5,
+        "Nutrient Deficient": 0
+      },
+      "Wheat": {
+        "Degraded/Critical": 15,
+        "Healthy/Balanced": 12,
+        "Nutrient Deficient": 1
+      }
+    },
+    "label_rule_analysis": {
+      "hypothesis": "Degraded/Critical if pH<6.0 or pH>8.0 or EC>2.0; else Nutrient Deficient if >=2 of {N<280, P<12.5, K<140, OC<0.5}; else Healthy/Balanced",
+      "rows_matching": 150,
+      "rows_total": 150,
+      "interpretation": "Labels are (near-)deterministic threshold rules of the soil measurements, typical of a synthetic / rule-labelled dataset. The ML model therefore learns this labelling scheme; it has not been validated against field-observed soil-health outcomes."
+    }
+  },
+  "baselines_holdout": {
+    "most_frequent": {
+      "n": 38,
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.3333,
+      "macro_f1": 0.2222,
+      "per_class": {
+        "Degraded/Critical": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1-score": 0.6667,
+          "support": 19.0
+        },
+        "Healthy/Balanced": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 15.0
+        },
+        "Nutrient Deficient": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 4.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Degraded/Critical",
+          "Healthy/Balanced",
+          "Nutrient Deficient"
+        ],
+        "matrix": [
+          [
+            19,
+            0,
+            0
+          ],
+          [
+            15,
+            0,
+            0
+          ],
+          [
+            4,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    "stratified": {
+      "n": 38,
+      "accuracy": 0.4737,
+      "balanced_accuracy": 0.3485,
+      "macro_f1": 0.349,
+      "per_class": {
+        "Degraded/Critical": {
+          "precision": 0.55,
+          "recall": 0.5789,
+          "f1-score": 0.5641,
+          "support": 19.0
+        },
+        "Healthy/Balanced": {
+          "precision": 0.5,
+          "recall": 0.4667,
+          "f1-score": 0.4828,
+          "support": 15.0
+        },
+        "Nutrient Deficient": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 4.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Degraded/Critical",
+          "Healthy/Balanced",
+          "Nutrient Deficient"
+        ],
+        "matrix": [
+          [
+            11,
+            5,
+            3
+          ],
+          [
+            7,
+            7,
+            1
+          ],
+          [
+            2,
+            2,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "model_selection": {
+    "cv": "RepeatedStratifiedKFold(5x3) on training split",
+    "metric": "macro-F1",
+    "n_candidates": 162,
+    "selection": {
+      "rule": "one-standard-error rule (fewest input fields within 1 SE of best CV macro-F1)",
+      "top_candidate": {
+        "cv_macro_f1": 0.9358,
+        "std": 0.0586,
+        "model": "DecisionTreeClassifier",
+        "feature_set": "all_soil"
+      },
+      "selected_candidate": {
+        "cv_macro_f1": 0.9358,
+        "std": 0.0586,
+        "cv_accuracy": 0.9585
+      }
+    },
+    "best_per_model_family": [
+      {
+        "model": "DecisionTreeClassifier",
+        "feature_set": "all_soil",
+        "engineered": true,
+        "mean_test_f1_macro": 0.9358418824,
+        "std_test_f1_macro": 0.0585592901,
+        "mean_test_accuracy": 0.9584980237,
+        "mean_test_balanced_accuracy": 0.9691582492,
+        "params": {
+          "clf": "DecisionTreeClassifier(class_weight='balanced', random_state=42)",
+          "clf__max_depth": null,
+          "clf__min_samples_leaf": 3,
+          "features__engineered": true
+        }
+      },
+      {
+        "model": "RandomForestClassifier",
+        "feature_set": "core",
+        "engineered": true,
+        "mean_test_f1_macro": 0.8961517648,
+        "std_test_f1_macro": 0.1218543145,
+        "mean_test_accuracy": 0.9554677207,
+        "mean_test_balanced_accuracy": 0.913973064,
+        "params": {
+          "clf": "RandomForestClassifier(class_weight='balanced_subsample', n_estimators=300,\n                       n_jobs=1, random_state=42)",
+          "clf__max_depth": null,
+          "clf__max_features": null,
+          "clf__min_samples_leaf": 1,
+          "features__engineered": true
+        }
+      },
+      {
+        "model": "LogisticRegression",
+        "feature_set": "core",
+        "engineered": true,
+        "mean_test_f1_macro": 0.7985973379,
+        "std_test_f1_macro": 0.1120504924,
+        "mean_test_accuracy": 0.8126482213,
+        "mean_test_balanced_accuracy": 0.8188776655,
+        "params": {
+          "clf": "LogisticRegression(class_weight='balanced', max_iter=5000)",
+          "clf__C": 10.0,
+          "features__engineered": true
+        }
+      },
+      {
+        "model": "HistGradientBoostingClassifier",
+        "feature_set": "core",
+        "engineered": true,
+        "mean_test_f1_macro": 0.652041954,
+        "std_test_f1_macro": 0.1136637931,
+        "mean_test_accuracy": 0.8065876153,
+        "mean_test_balanced_accuracy": 0.6493041526,
+        "params": {
+          "clf": "HistGradientBoostingClassifier(class_weight='balanced', early_stopping=False,\n                               max_iter=200, random_state=42)",
+          "clf__learning_rate": 0.05,
+          "clf__max_depth": 3,
+          "features__engineered": true
+        }
+      }
+    ]
+  },
+  "calibration_selection": {
+    "none": {
+      "log_loss": 1.0403,
+      "brier": 0.0986,
+      "top_label_ece": 0.0502,
+      "oof_macro_f1": 0.9093
+    },
+    "sigmoid": {
+      "log_loss": 0.2937,
+      "brier": 0.1357,
+      "top_label_ece": 0.1128,
+      "oof_macro_f1": 0.8956
+    },
+    "isotonic": {
+      "log_loss": 0.2226,
+      "brier": 0.1155,
+      "top_label_ece": 0.0635,
+      "oof_macro_f1": 0.8956
+    }
+  },
+  "cv_oof_training_split": {
+    "n": 112,
+    "accuracy": 0.9464,
+    "balanced_accuracy": 0.9604,
+    "macro_f1": 0.9093,
+    "per_class": {
+      "Degraded/Critical": {
+        "precision": 1.0,
+        "recall": 0.9464,
+        "f1-score": 0.9725,
+        "support": 56.0
+      },
+      "Healthy/Balanced": {
+        "precision": 0.9773,
+        "recall": 0.9348,
+        "f1-score": 0.9556,
+        "support": 46.0
+      },
+      "Nutrient Deficient": {
+        "precision": 0.6667,
+        "recall": 1.0,
+        "f1-score": 0.8,
+        "support": 10.0
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "Degraded/Critical",
+        "Healthy/Balanced",
+        "Nutrient Deficient"
+      ],
+      "matrix": [
+        [
+          53,
+          1,
+          2
+        ],
+        [
+          0,
+          43,
+          3
+        ],
+        [
+          0,
+          0,
+          10
+        ]
+      ]
+    }
+  },
+  "holdout": {
+    "n": 38,
+    "accuracy": 0.9474,
+    "balanced_accuracy": 0.8333,
+    "macro_f1": 0.8681,
+    "per_class": {
+      "Degraded/Critical": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 19.0
+      },
+      "Healthy/Balanced": {
+        "precision": 0.8824,
+        "recall": 1.0,
+        "f1-score": 0.9375,
+        "support": 15.0
+      },
+      "Nutrient Deficient": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1-score": 0.6667,
+        "support": 4.0
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "Degraded/Critical",
+        "Healthy/Balanced",
+        "Nutrient Deficient"
+      ],
+      "matrix": [
+        [
+          19,
+          0,
+          0
+        ],
+        [
+          0,
+          15,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ]
+      ]
+    },
+    "probability": {
+      "log_loss": 0.2588,
+      "brier": 0.1179,
+      "top_label_ece": 0.0441
+    }
+  },
+  "permutation_importance_holdout": [
+    {
+      "field": "ph",
+      "mean_drop_macro_f1": 0.3165,
+      "std": 0.0756
+    },
+    {
+      "field": "ec_ds_m",
+      "mean_drop_macro_f1": 0.1189,
+      "std": 0.0246
+    },
+    {
+      "field": "organic_carbon_pct",
+      "mean_drop_macro_f1": 0.085,
+      "std": 0.0586
+    },
+    {
+      "field": "nitrogen_kg_ha",
+      "mean_drop_macro_f1": 0.0759,
+      "std": 0.0471
+    },
+    {
+      "field": "phosphorus_kg_ha",
+      "mean_drop_macro_f1": 0.009,
+      "std": 0.0426
+    },
+    {
+      "field": "sulphur_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "zinc_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "iron_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "copper_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "manganese_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "boron_ppm",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "crop",
+      "mean_drop_macro_f1": 0.0,
+      "std": 0.0
+    },
+    {
+      "field": "potassium_kg_ha",
+      "mean_drop_macro_f1": -0.004,
+      "std": 0.0508
+    }
+  ],
+  "runtime_seconds": 40.5
+}
