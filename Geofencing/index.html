@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Field Walk Test</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 10px; }
+    button { font-size: 18px; padding: 12px; margin: 4px 4px 4px 0; }
+    input { font-size: 16px; padding: 8px; width: 60%; }
+    #map { height: 60vh; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <input id="fieldName" value="My field" />
+  <br />
+  <button id="start">Start walk</button>
+  <button id="finish" disabled>Finish</button>
+  <p id="status">Not started</p>
+  <div id="map"></div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const startBtn = document.getElementById("start");
+    const finishBtn = document.getElementById("finish");
+
+    const map = L.map("map").setView([28.6, 77.2], 17);
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      { maxZoom: 19, attribution: "Tiles © Esri" }
+    ).addTo(map);
+
+    const path = L.polyline([], { color: "lime", weight: 4 }).addTo(map);
+    const dot = L.circleMarker([28.6, 77.2], { radius: 7, color: "red" }).addTo(map);
+    let shapeLayer = null;
+
+    let traceId = null;
+    let watchId = null;
+    let latest = null;      // the most recent GPS reading
+    let savedCount = 0;
+
+    async function post(url, body) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || res.statusText);
+      return data;
+    }
+
+    startBtn.onclick = async () => {
+      try {
+        if (!navigator.geolocation) throw new Error("GPS is not supported here");
+
+        const name = document.getElementById("fieldName").value;
+        const field = await post("/fields", { name });
+        const trace = await post("/traces", {
+          field_id: field.field_id,
+          kind: "boundary",
+          name: "Field boundary",
+        });
+        traceId = trace.trace_id;
+
+        path.setLatLngs([]);
+        if (shapeLayer) { map.removeLayer(shapeLayer); shapeLayer = null; }
+        savedCount = 0;
+        latest = null;
+
+        startBtn.disabled = true;
+        finishBtn.disabled = false;
+        statusEl.textContent = "Waiting for GPS...";
+
+        watchId = navigator.geolocation.watchPosition(onFix, onGpsError, {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 15000,
+        });
+      } catch (e) {
+        statusEl.textContent = "Error: " + e.message;
+      }
+    };
+
+    // Runs whenever the phone reports a new position: just remember it and show it
+    function onFix(pos) {
+      latest = pos.coords;
+      dot.setLatLng([latest.latitude, latest.longitude]);
+      map.panTo([latest.latitude, latest.longitude]);
+    }
+
+    function onGpsError(err) {
+      statusEl.textContent = "GPS error: " + err.message;
+    }
+
+    // Runs every second: sends the latest known position to the backend
+    setInterval(async () => {
+      if (!traceId || !latest || finishBtn.disabled) return;
+
+      const lat = latest.latitude;
+      const lng = latest.longitude;
+      const accuracy = latest.accuracy;
+
+      try {
+        const r = await post(`/traces/${traceId}/points`, {
+          lat: lat, lng: lng, accuracy: accuracy, timestamp: Date.now() / 1000,
+        });
+        if (r.status === "saved") {
+          savedCount++;
+          path.addLatLng([lat, lng]);
+          statusEl.textContent = `Saved ${savedCount} points. Accuracy ${accuracy.toFixed(1)} m.`;
+        } else {
+          statusEl.textContent = `Ignored (weak GPS, accuracy ${accuracy.toFixed(1)} m).`;
+        }
+      } catch (e) {
+        statusEl.textContent = "Send error: " + e.message;
+      }
+    }, 1000);
+
+    finishBtn.onclick = async () => {
+      navigator.geolocation.clearWatch(watchId);
+      finishBtn.disabled = true;
+      try {
+        const r = await post(`/traces/${traceId}/finish`);
+        statusEl.textContent =
+          `Area: ${r.area_sqm} m² (${r.area_hectares} ha, ${r.area_acres} acres) from ${r.points_used} points.`;
+
+        const coords = path.getLatLngs().map(p => [p.lat, p.lng]);
+        shapeLayer = L.polygon(coords, { color: "yellow", weight: 3, fillOpacity: 0.2 }).addTo(map);
+        map.fitBounds(shapeLayer.getBounds());
+      } catch (e) {
+        statusEl.textContent = "Finish error: " + e.message;
+        finishBtn.disabled = false;
+      }
+      startBtn.disabled = false;
+    };
+  </script>
+</body>
+</html>
