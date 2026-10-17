@@ -1,0 +1,89 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* ──────────────────────────────────────────────
+   DharaDrishti Custom Color Palette & Variables
+   Theme: #186049, #4A943E, #ECE8AF, #B98327
+   ────────────────────────────────────────────── */
+:root {
+  --color-primary-dark: #186049;
+  --color-primary: #4A943E;
+  --color-accent-light: #ECE8AF;
+  --color-accent-dark: #B98327;
+  --background: #f8faf7;
+  --foreground: #186049;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4A943E;
+  border-radius: 9999px;
+}
+
+/* Animations */
+@keyframes voicePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(185, 131, 39, 0.7);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 14px rgba(185, 131, 39, 0);
+  }
+}
+
+.animate-voice-pulse {
+  animation: voicePulse 1.8s infinite ease-in-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Leaflet Map Tooltips styling */
+.leaflet-tooltip.map-tooltip-clean {
+  background-color: #186049 !important;
+  color: #ECE8AF !important;
+  border: 1px solid #ECE8AF !important;
+  border-radius: 10px !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+.leaflet-tooltip.map-tooltip-clean::before {
+  border-top-color: #186049 !important;
+}
