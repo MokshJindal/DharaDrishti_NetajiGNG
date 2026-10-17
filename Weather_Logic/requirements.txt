@@ -1,0 +1,4 @@
+# Minimal required dependencies for Weather_Logic
+pandas>=1.5.0
+numpy>=1.22.0
+scikit-learn>=1.1.0
