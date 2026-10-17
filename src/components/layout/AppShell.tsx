@@ -1,61 +1,33 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import Sidebar from '@/components/layout/Sidebar';
-import TopBar from '@/components/layout/TopBar';
+import Navbar, { NAV_LINKS } from '@/components/layout/Navbar';
 import VoiceButton from '@/components/layout/VoiceButton';
 
 const BOTTOM_NAV_ITEMS = [
-  { key: 'dashboard', href: '/', icon: '🏠' },
-  { key: 'myFields', href: '/fields', icon: '🗺️' },
-  { key: 'diagnose', href: '/diagnose', icon: '🔬' },
-  { key: 'weather', href: '/weather', icon: '⛅' },
-  { key: 'fasalScore', href: '/score', icon: '📊' },
+  { key: 'dashboard', href: '/', icon: '🏠', labelHi: 'होम', labelEn: 'Home' },
+  { key: 'myFields', href: '/fields', icon: '🗺️', labelHi: 'खेत', labelEn: 'Fields' },
+  { key: 'diagnose', href: '/diagnose', icon: '🌿', labelHi: 'डॉक्टर', labelEn: 'Doctor' },
+  { key: 'irrigation', href: '/irrigation', icon: '💧', labelHi: 'सिंचाई', labelEn: 'Water' },
+  { key: 'profit', href: '/profit', icon: '💰', labelHi: 'मंडी', labelEn: 'Mandi' },
+  { key: 'chatbot', href: '/chat', icon: '💬', labelHi: 'कृषि मित्र', labelEn: 'AI Mitra' },
 ] as const;
 
-const PAGE_TITLES: Record<string, string> = {
-  '/': 'dashboard',
-  '/fields': 'myFields',
-  '/diagnose': 'diagnose',
-  '/irrigation': 'irrigation',
-  '/fertiliser': 'irrigation',
-  '/profit': 'profit',
-  '/weather': 'weather',
-  '/score': 'fasalScore',
-  '/chat': 'chatbot',
-  '/settings': 'settings',
-};
-
-interface AppShellProps {
-  children: React.ReactNode;
-}
-
-export default function AppShell({ children }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  const toggleSidebar = useCallback(() => {
-    setSidebarOpen((prev) => !prev);
+  const toggleMobileDrawer = useCallback(() => {
+    setMobileDrawerOpen((prev) => !prev);
   }, []);
 
-  const closeSidebar = useCallback(() => {
-    setSidebarOpen(false);
+  const closeMobileDrawer = useCallback(() => {
+    setMobileDrawerOpen(false);
   }, []);
-
-  const pageTitleKey =
-    PAGE_TITLES[pathname] ||
-    PAGE_TITLES[
-      Object.keys(PAGE_TITLES).find(
-        (key) => key !== '/' && pathname.startsWith(key)
-      ) || '/'
-    ] ||
-    'dashboard';
-
-  const pageTitle = t(pageTitleKey, 'DharaDrishti');
 
   const isBottomNavActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -63,29 +35,88 @@ export default function AppShell({ children }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8faf7]">
-      {/* Desktop sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+    <div className="min-h-screen bg-[#f5f8f4] flex flex-col font-sans text-[#186049]">
+      {/* 1. Official Classy Government Portal Header */}
+      <Navbar onMobileMenuToggle={toggleMobileDrawer} />
 
-      {/* Mobile top bar */}
-      <TopBar title={pageTitle} onMenuToggle={toggleSidebar} />
+      {/* 2. Mobile Off-Canvas Drawer Menu */}
+      {mobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={closeMobileDrawer}
+          />
 
-      {/* Main content */}
-      <main className="min-h-screen pb-24 transition-all duration-300 md:pb-6 md:pl-64">
-        <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-6">
+          {/* Drawer Content */}
+          <div className="relative flex w-4/5 max-w-sm flex-col bg-[#186049] p-5 text-white shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/15 pb-4">
+              <div className="flex items-center gap-2.5">
+                <span className="text-3xl">🌱</span>
+                <div>
+                  <h2 className="text-lg font-black tracking-tight text-white">DharaDrishti</h2>
+                  <p className="text-xs text-[#ECE8AF]">धरादृष्टि • किसान सेवा</p>
+                </div>
+              </div>
+              <button
+                onClick={closeMobileDrawer}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20"
+                aria-label="Close Menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="mt-4 flex-1 overflow-y-auto space-y-1 py-2">
+              {NAV_LINKS.map((item) => {
+                const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    onClick={closeMobileDrawer}
+                    className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-bold transition ${
+                      active
+                        ? 'bg-[#ECE8AF] text-[#186049] shadow-md'
+                        : 'text-white/85 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-xl">{item.icon}</span>
+                    <span>{language === 'hi' ? item.labelHi : item.labelEn}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Quick Helpline inside drawer */}
+            <div className="border-t border-white/15 pt-4 text-xs">
+              <div className="rounded-xl bg-white/10 p-3 text-center">
+                <span className="block text-[#ECE8AF] font-bold">24x7 Kisan Call Center</span>
+                <span className="text-base font-black text-white">📞 1800-180-1551</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Main Full-Width Portal Body */}
+      <main className="flex-1 pb-24 md:pb-12">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5">
           {children}
         </div>
       </main>
 
-      {/* Floating Global Voice Button */}
+      {/* 4. Global Voice Floating Trigger Button */}
       <VoiceButton />
 
-      {/* Mobile bottom navigation */}
+      {/* 5. Mobile Bottom Sticky Navigation */}
       <nav
-        className="safe-bottom fixed bottom-0 left-0 right-0 z-40 border-t border-[#186049]/15 bg-white/95 backdrop-blur-md md:hidden shadow-lg"
+        className="safe-bottom fixed bottom-0 left-0 right-0 z-40 border-t border-[#186049]/20 bg-white/95 backdrop-blur-md md:hidden shadow-lg"
         aria-label="Mobile Navigation"
       >
-        <div className="flex h-16 items-center justify-around px-2">
+        <div className="flex h-16 items-center justify-around px-1">
           {BOTTOM_NAV_ITEMS.map((item) => {
             const active = isBottomNavActive(item.href);
             return (
@@ -103,14 +134,38 @@ export default function AppShell({ children }: AppShellProps) {
                 <span className="text-xl" role="img" aria-hidden="true">
                   {item.icon}
                 </span>
-                <span className="mt-0.5 text-[10px] leading-tight truncate max-w-[64px]">
-                  {t(item.key, item.key)}
+                <span className="mt-0.5 text-[10px] leading-tight truncate max-w-[56px]">
+                  {language === 'hi' ? item.labelHi : item.labelEn}
                 </span>
               </Link>
             );
           })}
         </div>
       </nav>
+
+      {/* 6. Classy Portal Footer */}
+      <footer className="hidden md:block border-t border-gray-200 bg-white py-6 text-xs text-gray-600">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🌱</span>
+            <div>
+              <p className="font-extrabold text-[#186049]">
+                DharaDrishti • Smart Environmental & Agricultural GIS Platform
+              </p>
+              <p className="text-[11px] text-gray-500">
+                Ministry of Agriculture & Farmers Welfare • Government of India
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 font-semibold">
+            <Link href="/fields" className="hover:text-[#186049]">Field GIS Map</Link>
+            <Link href="/fertiliser" className="hover:text-[#186049]">Soil Health Card</Link>
+            <Link href="/diagnose" className="hover:text-[#186049]">Crop Sentinel</Link>
+            <Link href="/profit" className="hover:text-[#186049]">APMC Mandi Rates</Link>
+            <Link href="/settings" className="hover:text-[#186049]">Languages (10)</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
