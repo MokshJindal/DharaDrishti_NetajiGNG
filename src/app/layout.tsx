@@ -5,13 +5,13 @@ import { VoiceProvider } from '@/lib/voice/VoiceContext';
 import AppShell from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
-  title: 'DharaDrishti – Voice-First Smart Farm Assistant',
+  title: 'DharaDrishti – Simple & Voice-First Farm Assistant',
   description:
-    'AI-powered voice-first farm management assistant for Indian farmers. Geo-fencing, crop disease doctor, irrigation schedule, live mandi profit, and Fasal Score in multiple regional languages.',
+    'Calm, accessible, voice-first farm management assistant for Indian farmers. Land boundary mapping, leaf doctor, irrigation alerts, and mandi rates in 10 Indian languages.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'DharaDrishti',
   },
   formatDetection: {
@@ -25,7 +25,6 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: '#186049',
-  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -36,15 +35,17 @@ export default function RootLayout({
   return (
     <html lang="hi">
       <head>
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
+        <meta charSet="utf-8" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
         />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="font-sans antialiased bg-[#f9faf7] text-[#186049]">
+      <body className="antialiased bg-[#f8faf7] text-[#186049]">
         <LanguageProvider>
           <VoiceProvider>
             <AppShell>{children}</AppShell>
