@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { useVoice } from '@/lib/voice/VoiceContext';
+import { useVoice, voiceEventBus } from '@/lib/voice/VoiceContext';
 import { MOCK_DISEASES, DiseaseRecord, PRIMARY_FIELD } from '@/lib/data/mockData';
 
 const MapComponent = dynamic(() => import('@/components/map/MapComponent'), {
@@ -133,6 +133,21 @@ export default function DiagnosePage() {
 
     return unregister;
   }, [activeDiagnosis, language, registerActionHandler, speak, triggerCapture]);
+
+  // Global voice action event listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'open_camera' || detail?.action === 'check_disease') {
+        triggerCapture();
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [triggerCapture]);
 
   const mapPins = diseaseHistory.map((d) => ({
     id: d.id,

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { useVoice } from '@/lib/voice/VoiceContext';
+import { useVoice, voiceEventBus } from '@/lib/voice/VoiceContext';
 import { MOCK_WEATHER_FORECAST, PRIMARY_FIELD } from '@/lib/data/mockData';
 
 export default function WeatherPage() {
@@ -40,6 +40,21 @@ export default function WeatherPage() {
 
     return unregister;
   }, [registerActionHandler, speakWeatherForecast]);
+
+  // Global voice action listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'check_weather') {
+        speakWeatherForecast();
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [speakWeatherForecast]);
 
   return (
     <div className="space-y-6">

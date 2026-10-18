@@ -68,6 +68,21 @@ export default function FasalScorePage() {
     };
   }, [addStockItem]);
 
+  // Global voice action listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'check_score') {
+        speakScoreBreakdown();
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [speakScoreBreakdown]);
+
   // Voice commands on this page
   useEffect(() => {
     const unregister = registerActionHandler((spoken: string) => {

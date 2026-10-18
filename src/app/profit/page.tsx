@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { useVoice } from '@/lib/voice/VoiceContext';
+import { useVoice, voiceEventBus } from '@/lib/voice/VoiceContext';
 import { MOCK_MANDI_PRICES } from '@/lib/data/mockData';
 import { calculateProfit } from '@/lib/rules/profitEngine';
 
@@ -66,6 +66,27 @@ export default function ProfitPage() {
 
     return unregister;
   }, [language, registerActionHandler, speak, speakProfitSummary]);
+
+  // Global voice action listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'calc_profit') {
+        speakProfitSummary();
+      } else if (detail?.action === 'check_mandi') {
+        const text =
+          language === 'hi'
+            ? 'शिरूर मंडी में गेहूं का भाव ₹2,480 और सरसों का भाव ₹5,650 प्रति क्विंटल है।'
+            : 'Shirur Mandi: Wheat rate is ₹2,480 and Mustard is ₹5,650 per quintal.';
+        speak(text);
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [language, speak, speakProfitSummary]);
 
   return (
     <div className="space-y-6">

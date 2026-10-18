@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { useVoice } from '@/lib/voice/VoiceContext';
+import { useVoice, voiceEventBus } from '@/lib/voice/VoiceContext';
 import {
   PRIMARY_FIELD,
   MOCK_WEATHER_FORECAST,
@@ -95,6 +95,25 @@ export default function IrrigationPage() {
 
     return unregister;
   }, [registerActionHandler, speakFertiliserAdvice, speakIrrigationAdvice]);
+
+  // Global voice action listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'check_irrigation' || detail?.action === 'check_rain') {
+        setActiveTab('irrigation');
+        speakIrrigationAdvice();
+      } else if (detail?.action === 'calc_fertiliser') {
+        setActiveTab('fertiliser');
+        speakFertiliserAdvice();
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [speakFertiliserAdvice, speakIrrigationAdvice]);
 
   return (
     <div className="space-y-6">

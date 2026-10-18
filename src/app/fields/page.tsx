@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { useVoice } from '@/lib/voice/VoiceContext';
+import { useVoice, voiceEventBus } from '@/lib/voice/VoiceContext';
 import { PRIMARY_FIELD, SubPlot } from '@/lib/data/mockData';
 import { calculateArea } from '@/lib/geo/geoUtils';
 
@@ -174,6 +174,25 @@ export default function FieldsPage() {
 
     return unregister;
   }, [handleSaveField, handleStartWalking, handleStopWalking, handleToggleDraw, language, registerActionHandler, speak]);
+
+  // Global voice action listener
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleVoiceAction = (e: any) => {
+      const detail = e.detail;
+      if (detail?.action === 'start_walk') {
+        handleStartWalking();
+      } else if (detail?.action === 'draw_field') {
+        handleToggleDraw();
+      } else if (detail?.action === 'save_field') {
+        handleSaveField();
+      }
+    };
+    voiceEventBus.addEventListener('voice_action', handleVoiceAction as EventListener);
+    return () => {
+      voiceEventBus.removeEventListener('voice_action', handleVoiceAction as EventListener);
+    };
+  }, [handleSaveField, handleStartWalking, handleToggleDraw]);
 
   return (
     <div className="space-y-6">
