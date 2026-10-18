@@ -46,6 +46,10 @@ export interface DiseaseRecord {
   organicTreatment: string;
   chemicalTreatment: string;
   imageUrl: string;
+  healthScore?: number;
+  healthStatus?: 'healthy' | 'moderate' | 'damaged';
+  immediateAction?: string;
+  precautions?: string;
 }
 
 export interface MandiPrice {
@@ -168,8 +172,12 @@ export const MOCK_DISEASES: DiseaseRecord[] = [
     organicTreatment:
       'Spray 5% Neem seed kernel extract (NSKE) or Trichoderma harzianum (5g/L water) in early morning.',
     chemicalTreatment:
-      'If expanding rapidly: Spray Propiconazole 25% EC @ 1 ml/litre water immediately.',
+      'Mix 25 ml Propiconazole 25% EC per 15-litre spray pump and spray immediately.',
     imageUrl: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=600&q=80',
+    healthScore: 48,
+    healthStatus: 'damaged',
+    immediateAction: 'खेत में रोगग्रस्त पौधों के पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।',
+    precautions: 'तेज धूप में छिड़काव न करें। बारिश से पहले दवा न डालें।',
   },
   {
     id: 'dis-02',
@@ -189,8 +197,12 @@ export const MOCK_DISEASES: DiseaseRecord[] = [
     organicTreatment:
       'Spray Cow urine (Gomutra) 10% solution mixed with hing (asafetida 1g/L) as a natural antifungal.',
     chemicalTreatment:
-      'Mancozeb 75% WP @ 2g/litre of water on affected patches.',
+      'Mancozeb 75% WP @ 30g in 15-litre water spray pump on affected patches.',
     imageUrl: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80',
+    healthScore: 72,
+    healthStatus: 'moderate',
+    immediateAction: 'निचले सूखे और धब्बेदार पत्तों को काटकर नष्ट करें।',
+    precautions: 'सुबह ओस सूखने के बाद ही छिड़काव करें।',
   },
 ];
 

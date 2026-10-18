@@ -11,24 +11,58 @@ const MapComponent = dynamic(() => import('@/components/map/MapComponent'), {
   loading: () => <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />,
 });
 
+// Demo leaf samples for instant testing without camera
+const SAMPLE_LEAVES = [
+  {
+    id: 'demo-healthy',
+    title: 'स्वस्थ गेहूं (Healthy)',
+    subtitle: 'Healthy Wheat Leaf',
+    crop: 'Wheat',
+    status: 'healthy' as const,
+    score: 96,
+    icon: '🌾',
+    image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: 'demo-rust',
+    title: 'पीला रतुआ (Yellow Rust)',
+    subtitle: 'Wheat Stripe Rust',
+    crop: 'Wheat',
+    status: 'damaged' as const,
+    score: 48,
+    icon: '🍂',
+    image: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: 'demo-blight',
+    title: 'झुलसा रोग (Leaf Blight)',
+    subtitle: 'Mustard Alternaria Blight',
+    crop: 'Mustard',
+    status: 'moderate' as const,
+    score: 72,
+    icon: '🍁',
+    image: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
+  },
+];
+
 export default function DiagnosePage() {
   const { t, language } = useLanguage();
-  const { speak, registerActionHandler } = useVoice();
+  const { speak, isSpeaking, stopSpeaking, registerActionHandler } = useVoice();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(MOCK_DISEASES[0].imageUrl);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeDiagnosis, setActiveDiagnosis] = useState<DiseaseRecord | null>(MOCK_DISEASES[0]);
   const [diseaseHistory, setDiseaseHistory] = useState<DiseaseRecord[]>(MOCK_DISEASES);
 
   const startAnalysis = useCallback(
-    async (imageSrc: string) => {
+    async (imageSrc: string, cropHint = 'Wheat') => {
       setSelectedImage(imageSrc);
       setIsAnalyzing(true);
       speak(
         language === 'hi'
           ? 'पत्ती की तस्वीर का विश्लेषण किया जा रहा है...'
-          : 'Analyzing crop leaf image for pests and disease symptoms...'
+          : 'Analyzing crop leaf image for health and disease...'
       );
 
       try {
@@ -37,7 +71,7 @@ export default function DiagnosePage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             image: imageSrc,
-            cropHint: 'Wheat',
+            cropHint,
             language,
           }),
         });
@@ -47,19 +81,23 @@ export default function DiagnosePage() {
           const d = data.diagnosis;
           const result: DiseaseRecord = {
             id: `dis-${Date.now()}`,
-            crop: d.crop || 'Wheat',
-            diseaseName: d.diseaseName || 'Leaf Infection',
+            crop: d.crop || cropHint,
+            diseaseName: d.diseaseName || 'Leaf Diagnosis',
             regionalName: d.regionalName || d.diseaseName,
             confidence: d.confidence || 92,
             severity: d.severity || 'medium',
             detectedAt: new Date().toLocaleString(),
             location: [18.8262, 74.3731],
-            subPlotName: 'Plot A (Wheat)',
-            cause: d.cause || 'Pathogen infection detected on foliage.',
-            symptoms: d.symptoms || ['Discoloration on leaf tissue'],
+            subPlotName: 'Plot A (North)',
+            cause: d.cause || 'Pathogen analysis completed.',
+            symptoms: d.symptoms || ['Visual leaf symptoms observed'],
             organicTreatment: d.organicTreatment || 'Spray 5% Neem Seed Kernel Extract (NSKE).',
-            chemicalTreatment: d.chemicalTreatment || 'Apply recommended ICAR fungicide.',
+            chemicalTreatment: d.chemicalTreatment || 'Apply recommended ICAR spray.',
             imageUrl: imageSrc,
+            healthScore: typeof d.healthScore === 'number' ? d.healthScore : 70,
+            healthStatus: d.healthStatus || 'moderate',
+            immediateAction: d.immediateAction || 'Check nearby crop patches for symptoms.',
+            precautions: d.precautions || 'Avoid spraying in midday heat or just before rain.',
           };
 
           setActiveDiagnosis(result);
@@ -70,22 +108,22 @@ export default function DiagnosePage() {
           } else {
             speak(
               language === 'hi'
-                ? `जांच परिणाम: ${result.crop} में ${result.regionalName || result.diseaseName} देखा गया है।`
-                : `Diagnosis: ${result.diseaseName} detected on ${result.crop}.`
+                ? `स्वास्थ्य स्कोर ${result.healthScore} प्रतिशत है। ${result.crop} में ${result.regionalName || result.diseaseName} देखा गया।`
+                : `Health score is ${result.healthScore}%. ${result.diseaseName} identified on ${result.crop}.`
             );
           }
           setIsAnalyzing(false);
           return;
         }
       } catch (err) {
-        console.warn('Diagnosis API call failed, falling back to local dataset:', err);
+        console.warn('Diagnosis API error, using fallback:', err);
       }
 
-      // Fallback
+      // Offline / Error Fallback
       setIsAnalyzing(false);
       const fallbackResult: DiseaseRecord = {
         id: `dis-${Date.now()}`,
-        crop: 'Wheat',
+        crop: cropHint,
         diseaseName: 'Yellow Rust (Stripe Rust)',
         regionalName: 'पीला रतुआ (हळद्या)',
         confidence: 94,
@@ -93,24 +131,32 @@ export default function DiagnosePage() {
         detectedAt: new Date().toLocaleString(),
         location: [18.8262, 74.3731],
         subPlotName: 'Plot A (Wheat)',
-        cause: 'Fungal spores (Puccinia striiformis) thriving in 10-15°C dew moisture.',
+        cause: 'Fungal pathogen (Puccinia striiformis) thriving in 10-15°C dew moisture.',
         symptoms: [
           'Yellow powdery stripes parallel along wheat flag leaves',
-          'Reduced grain filling and premature drying',
+          'Premature leaf drying and reduced grain filling',
         ],
         organicTreatment:
-          'Spray 5% Neem Seed Kernel Extract (NSKE) or Trichoderma harzianum (5g/L water) in early morning.',
+          language === 'hi'
+            ? 'सुबह के समय 5% नीम का अर्क (NSKE) या ट्राइकोडर्मा (5 ग्राम/लीटर) का छिड़काव करें।'
+            : 'Spray 5% Neem Seed Kernel Extract (NSKE) or Trichoderma (5g/L water) in early morning.',
         chemicalTreatment:
-          'If yellow pustules cover > 5% of leaf area: Spray Propiconazole 25% EC (1 ml/L water) immediately.',
+          language === 'hi'
+            ? '15 लीटर की स्प्रे टंकी में 25 मिली प्रोपिकोनाज़ोल 25% EC मिलाकर तुरंत छिड़काव करें।'
+            : 'Mix 25 ml Propiconazole 25% EC per 15-liter spray tank and spray immediately.',
         imageUrl: imageSrc,
+        healthScore: 48,
+        healthStatus: 'damaged',
+        immediateAction: 'रोगग्रस्त पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।',
+        precautions: 'तेज धूप में छिड़काव न करें। यदि 6 घंटे में बारिश का अनुमान हो तो छिड़काव टालें।',
       };
 
       setActiveDiagnosis(fallbackResult);
       setDiseaseHistory((prev) => [fallbackResult, ...prev]);
       speak(
         language === 'hi'
-          ? 'जांच परिणाम: गेहूं में पीला रतुआ देखा गया है। तुरंत नीम का तेल या प्रोपिकोनाज़ोल का छिड़काव करें।'
-          : 'Diagnosis complete: Yellow rust detected on wheat with 94% confidence.'
+          ? 'फसल स्वास्थ्य स्कोर 48 प्रतिशत है। गेहूं में पीला रतुआ देखा गया है। 15 लीटर टंकी में 25 मिली प्रोपिकोनाज़ोल का छिड़काव करें।'
+          : 'Crop health score is 48%. Yellow Rust detected on wheat. Mix 25 ml Propiconazole per 15L spray tank.'
       );
     },
     [language, speak]
@@ -122,19 +168,18 @@ export default function DiagnosePage() {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          startAnalysis(event.target.result as string);
+          startAnalysis(event.target.result as string, 'Wheat');
         }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Trigger camera / file input
   const triggerCapture = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
 
-  // Voice command listener
+  // Voice command listener on this page
   useEffect(() => {
     const unregister = registerActionHandler((spoken: string) => {
       if (
@@ -151,27 +196,19 @@ export default function DiagnosePage() {
         spoken.includes('diagnose') ||
         spoken.includes('जांच') ||
         spoken.includes('बीमारी') ||
-        spoken.includes('रोग')
+        spoken.includes('रोग') ||
+        spoken.includes('health') ||
+        spoken.includes('स्वास्थ्य')
       ) {
         if (activeDiagnosis) {
+          const score = activeDiagnosis.healthScore || 50;
           speak(
             language === 'hi'
-              ? `रोग का नाम: ${activeDiagnosis.diseaseName} (${activeDiagnosis.regionalName})। जैविक उपचार: ${activeDiagnosis.organicTreatment}`
-              : `Condition: ${activeDiagnosis.diseaseName}. Organic remedy: ${activeDiagnosis.organicTreatment}`
+              ? `फसल का स्वास्थ्य स्कोर ${score} प्रतिशत है। स्थिति: ${activeDiagnosis.diseaseName} (${activeDiagnosis.regionalName})। दवा: ${activeDiagnosis.chemicalTreatment}`
+              : `Crop health score is ${score}%. Condition: ${activeDiagnosis.diseaseName}. Remedy: ${activeDiagnosis.chemicalTreatment}`
           );
         } else {
           triggerCapture();
-        }
-        return true;
-      }
-      if (
-        spoken.includes('remedy') ||
-        spoken.includes('उपचार') ||
-        spoken.includes('दवा') ||
-        spoken.includes('इलाज')
-      ) {
-        if (activeDiagnosis) {
-          speak(activeDiagnosis.organicTreatment);
         }
         return true;
       }
@@ -201,161 +238,426 @@ export default function DiagnosePage() {
     lat: d.location[0],
     lng: d.location[1],
     title: `${d.crop}: ${d.diseaseName}`,
-    description: `${d.severity.toUpperCase()} severity • Detected ${d.detectedAt}`,
+    description: `Health: ${d.healthScore || 50}% • Detected ${d.detectedAt}`,
     severity: d.severity,
   }));
 
+  const healthScore = activeDiagnosis?.healthScore ?? 48;
+  const isHealthy = healthScore >= 90;
+  const isModerate = healthScore >= 65 && healthScore < 90;
+  const isDamaged = healthScore < 65;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+      {/* Top Banner */}
+      <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold text-[#4A943E] uppercase tracking-wider">
-            🔬 AI Crop Health Doctor
-          </span>
-          <h1 className="text-2xl font-black text-[#186049]">
-            {t('diseaseTitle', 'AI Leaf & Crop Disease Doctor')}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-[#4A943E] uppercase tracking-wider">
+              🔬 ICAR & Claude AI Crop Doctor
+            </span>
+            <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+              Live Vision Active
+            </span>
+          </div>
+          <h1 className="text-2xl font-black text-[#186049] mt-1">
+            {language === 'hi'
+              ? 'फसल स्वास्थ्य व रोग पहचान डॉक्टर'
+              : language === 'pa'
+              ? 'ਫ਼ਸਲ ਸਿਹਤ ਅਤੇ ਬਿਮਾਰੀ ਜਾਂਚ ਡਾਕਟਰ'
+              : 'Crop Health & Disease Doctor'}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-            Take photo of leaves. Claude Vision identifies disease, severity, organic & chemical remedies, and pins to map.
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-xl">
+            {language === 'hi'
+              ? 'पत्ती की फोटो खींचें। एआई बताएगा कि फसल स्वस्थ है या बीमार, और क्या उपचार करना चाहिए।'
+              : 'Upload or capture a leaf photo. AI determines health status, disease type, and exact treatment steps.'}
           </p>
         </div>
 
-        <button
-          onClick={triggerCapture}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#186049] text-white font-bold text-sm shadow hover:bg-[#124b39] transition active:scale-95"
-        >
-          <span className="text-xl">📷</span>
-          <span>{t('uploadOrCapture', 'Take Photo / Upload Leaf')}</span>
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={triggerCapture}
+            className="flex-1 md:flex-initial flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-[#186049] text-white font-extrabold text-sm shadow-md hover:bg-[#124b39] transition active:scale-95"
+          >
+            <span className="text-xl">📷</span>
+            <span>
+              {language === 'hi'
+                ? 'कैमरा से फोटो लें'
+                : language === 'pa'
+                ? 'ਕੈਮਰੇ ਤੋਂ ਫੋਟੋ ਲਵੋ'
+                : 'Take Leaf Photo'}
+            </span>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+        </div>
       </div>
 
-      {/* Upload & Scanner Box */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Photo Box */}
-        <div
-          onClick={triggerCapture}
-          className="cursor-pointer group relative flex flex-col items-center justify-center min-h-[300px] rounded-3xl border-3 border-dashed border-[#186049]/30 bg-white p-6 text-center hover:border-[#4A943E] hover:bg-[#ECE8AF]/10 transition"
-        >
-          {selectedImage || activeDiagnosis?.imageUrl ? (
-            <div className="relative w-full h-72 rounded-2xl overflow-hidden shadow-inner">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={selectedImage || activeDiagnosis?.imageUrl}
-                alt="Crop leaf sample"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white">
-                Leaf Sample Geotagged 📍
+      {/* 1-Click Demo Leaves Section */}
+      <div className="bg-[#FAF8F5] p-4 rounded-3xl border border-amber-100/60">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <p className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+            <span>🧪</span>
+            <span>
+              {language === 'hi'
+                ? 'त्वरित परीक्षण के लिए नमूना पत्ती चुनें (1-Click Demo):'
+                : 'Test instantly with sample leaves:'}
+            </span>
+          </p>
+          <span className="text-[11px] text-gray-400 font-medium hidden sm:inline">
+            Tap any leaf below to diagnose
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {SAMPLE_LEAVES.map((sample) => (
+            <button
+              key={sample.id}
+              onClick={() => startAnalysis(sample.image, sample.crop)}
+              disabled={isAnalyzing}
+              className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-200 hover:border-[#4A943E] hover:shadow-md transition text-left group"
+            >
+              <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-gray-100 border relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sample.image}
+                  alt={sample.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                />
               </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[#186049]/10 text-4xl flex items-center justify-center text-[#186049] group-hover:scale-110 transition">
-                📸
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-800 truncate">
+                    {sample.title}
+                  </span>
+                  <span
+                    className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                      sample.status === 'healthy'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : sample.status === 'moderate'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {sample.score}%
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                  {sample.subtitle}
+                </p>
               </div>
-              <div className="font-extrabold text-base text-[#186049]">
-                {t('uploadOrCapture', 'Take Photo or Choose Leaf Picture')}
-              </div>
-              <p className="text-xs text-gray-500 max-w-xs mx-auto">
-                Capture the underside or affected yellow/brown spots clearly.
-              </p>
-            </div>
-          )}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          {isAnalyzing && (
-            <div className="absolute inset-0 bg-[#186049]/80 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-white space-y-3 z-10">
-              <span className="text-4xl animate-bounce">🔬</span>
-              <div className="text-sm font-bold animate-pulse text-[#ECE8AF]">
-                {t('diagnosing', 'Analyzing leaf symptoms with AI...')}
+      {/* Main Analysis & Results Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Photo Preview & Health Meter (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Photo Preview Box */}
+          <div
+            onClick={triggerCapture}
+            className="cursor-pointer group relative min-h-[280px] rounded-3xl border-2 border-dashed border-[#186049]/30 bg-white p-4 text-center hover:border-[#4A943E] transition overflow-hidden shadow-sm flex flex-col justify-center items-center"
+          >
+            {selectedImage ? (
+              <div className="relative w-full h-64 rounded-2xl overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedImage}
+                  alt="Leaf photo"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                />
+                <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-white flex items-center gap-1">
+                  <span>📍</span>
+                  <span>Geotagged Leaf</span>
+                </div>
+                <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow">
+                  📷 Tap to change photo
+                </div>
               </div>
+            ) : (
+              <div className="py-8 space-y-2">
+                <span className="text-5xl block">📸</span>
+                <p className="font-bold text-sm text-[#186049]">
+                  {language === 'hi' ? 'पत्ती की फोटो अपलोड करें' : 'Upload or Take Leaf Photo'}
+                </p>
+                <p className="text-xs text-gray-400">
+                  Click here to open camera or browse files
+                </p>
+              </div>
+            )}
+
+            {isAnalyzing && (
+              <div className="absolute inset-0 bg-[#186049]/85 backdrop-blur-md flex flex-col items-center justify-center text-white space-y-3 z-10 p-4">
+                <span className="text-5xl animate-bounce">🔬</span>
+                <p className="text-base font-bold animate-pulse text-[#ECE8AF]">
+                  {language === 'hi'
+                    ? 'AI पत्ती के लक्षणों की जांच कर रहा है...'
+                    : 'Claude Vision analyzing leaf symptoms...'}
+                </p>
+                <p className="text-xs text-emerald-100 max-w-xs text-center">
+                  Checking for rust, fungal spores, blights, and leaf vigor...
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Health Status Level Card */}
+          {activeDiagnosis && (
+            <div
+              className={`p-5 rounded-3xl border-2 shadow-sm transition-all ${
+                isHealthy
+                  ? 'bg-emerald-50/70 border-emerald-300'
+                  : isModerate
+                  ? 'bg-amber-50/70 border-amber-300'
+                  : 'bg-red-50/70 border-red-300'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">
+                    {isHealthy ? '🟢' : isModerate ? '🟡' : '🔴'}
+                  </span>
+                  <div>
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-500">
+                      {language === 'hi' ? 'स्वास्थ्य स्तर (Health Status)' : 'Crop Health Status'}
+                    </span>
+                    <h3
+                      className={`text-lg font-black ${
+                        isHealthy
+                          ? 'text-emerald-900'
+                          : isModerate
+                          ? 'text-amber-900'
+                          : 'text-red-900'
+                      }`}
+                    >
+                      {isHealthy
+                        ? (language === 'hi' ? 'फसल सुरक्षित व स्वस्थ है' : 'Crop is Healthy & Safe')
+                        : isModerate
+                        ? (language === 'hi' ? 'शुरुआती लक्षण (चेतावनी)' : 'Early Symptoms (Alert)')
+                        : (language === 'hi' ? 'फसल क्षतिग्रस्त / बीमार है' : 'Crop is Damaged / Infected')}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span
+                    className={`text-2xl font-black ${
+                      isHealthy
+                        ? 'text-emerald-700'
+                        : isModerate
+                        ? 'text-amber-700'
+                        : 'text-red-700'
+                    }`}
+                  >
+                    {healthScore}%
+                  </span>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">
+                    Health Score
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden mt-3 shadow-inner">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    isHealthy
+                      ? 'bg-emerald-600'
+                      : isModerate
+                      ? 'bg-amber-500'
+                      : 'bg-red-600'
+                  }`}
+                  style={{ width: `${healthScore}%` }}
+                />
+              </div>
+
+              <p className="text-xs text-gray-700 mt-2 font-medium">
+                {isHealthy
+                  ? 'फसल में कोई गंभीर बीमारी नहीं है। किसी भी रासायनिक छिड़काव की आवश्यकता नहीं है।'
+                  : isModerate
+                  ? 'पत्तियों पर धब्बे दिखने लगे हैं। तुरंत जैविक उपचार करें ताकि रोग न फैले।'
+                  : 'सक्रिय रोग का प्रकोप देखा गया है। फसल बचाने के लिए तुरंत अनुशंसित दवा का छिड़काव करें।'}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Diagnosis Results Card */}
-        {activeDiagnosis && (
-          <div className="rounded-3xl bg-white p-6 shadow-md border-2 border-[#186049]/10 space-y-4">
-            <div className="flex items-start justify-between border-b pb-3">
-              <div>
-                <span className="text-xs font-bold text-gray-400 uppercase">
-                  {t('detectedDisease', 'Identified Condition')}
-                </span>
-                <h3 className="text-xl font-black text-[#186049]">
-                  {activeDiagnosis.diseaseName}
-                </h3>
-                <span className="text-xs font-bold text-[#B98327]">
-                  {activeDiagnosis.regionalName}
-                </span>
+        {/* Right Column: Step-by-Step Farmer Guide & Action Cards (7 cols) */}
+        <div className="lg:col-span-7 space-y-4">
+          {activeDiagnosis && (
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-5">
+              {/* Header with Title and Audio Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+                <div>
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    {t('detectedDisease', 'Identified Pathology')}
+                  </span>
+                  <h2 className="text-xl font-black text-[#186049]">
+                    {activeDiagnosis.diseaseName}
+                  </h2>
+                  <p className="text-xs font-bold text-[#B98327]">
+                    {activeDiagnosis.regionalName} • {activeDiagnosis.crop}
+                  </p>
+                </div>
+
+                {/* Voice Readout Button */}
+                <button
+                  onClick={() => {
+                    if (isSpeaking) {
+                      stopSpeaking();
+                    } else {
+                      const msg =
+                        language === 'hi'
+                          ? `फसल स्वास्थ्य स्कोर ${healthScore} प्रतिशत है। स्थिति: ${activeDiagnosis.diseaseName} (${activeDiagnosis.regionalName})। पहला कदम: ${activeDiagnosis.immediateAction || 'रोगग्रस्त पत्तों को हटाएं'}। दवा: ${activeDiagnosis.chemicalTreatment}`
+                          : `Health score is ${healthScore}%. Disease: ${activeDiagnosis.diseaseName}. Immediate action: ${activeDiagnosis.immediateAction || 'Check leaf patches'}. Chemical spray: ${activeDiagnosis.chemicalTreatment}`;
+                      speak(msg);
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-sm transition active:scale-95 ${
+                    isSpeaking
+                      ? 'bg-amber-500 text-white animate-pulse'
+                      : 'bg-emerald-50 text-[#186049] hover:bg-emerald-100 border border-emerald-200'
+                  }`}
+                >
+                  <span className="text-base">{isSpeaking ? '⏹️' : '🔊'}</span>
+                  <span>
+                    {isSpeaking
+                      ? (language === 'hi' ? 'बोलना बंद करें' : 'Stop Speaking')
+                      : (language === 'hi' ? 'आवाज़ में सलाह सुनें' : 'Listen to Advice')}
+                  </span>
+                </button>
               </div>
 
-              <div className="text-right">
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-[#4A943E]/10 text-[#4A943E]">
-                  {activeDiagnosis.confidence}% Confidence
+              {/* Cause & Symptoms */}
+              <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-100">
+                <span className="text-[11px] font-bold text-gray-500 uppercase">
+                  संक्रमण का कारण (Pathogen / Cause)
                 </span>
-                <div className="text-[11px] font-bold text-amber-700 mt-1 uppercase">
-                  {activeDiagnosis.severity} Severity
+                <p className="text-xs text-gray-800 font-medium mt-0.5 leading-relaxed">
+                  {activeDiagnosis.cause}
+                </p>
+                {activeDiagnosis.symptoms && activeDiagnosis.symptoms.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {activeDiagnosis.symptoms.map((s, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[11px] bg-white px-2.5 py-1 rounded-lg border text-gray-600 font-medium"
+                      >
+                        • {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 4-Step Farmer Guide */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-extrabold text-[#186049] uppercase tracking-wider flex items-center gap-1.5">
+                  <span>📋</span>
+                  <span>
+                    {language === 'hi'
+                      ? 'किसान कार्य योजना (अब क्या करें? - 4 आसान चरण)'
+                      : 'Farmer Action Plan (What to Do Now)'}
+                  </span>
+                </h3>
+
+                {/* Step 1: Immediate Action */}
+                <div className="flex items-start gap-3 p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200">
+                  <div className="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-blue-900 uppercase">
+                      {language === 'hi'
+                        ? 'पहला कदम: अगले 24 घंटे में'
+                        : 'Step 1: Immediate Action (Next 24h)'}
+                    </h4>
+                    <p className="text-xs text-blue-800 font-semibold mt-0.5 leading-relaxed">
+                      {activeDiagnosis.immediateAction ||
+                        (language === 'hi'
+                          ? 'खेत में रोगग्रस्त पौधों के पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।'
+                          : 'Isolate affected plant patches and avoid excess standing moisture.')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2: Organic Remedy */}
+                <div className="flex items-start gap-3 p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200">
+                  <div className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-900 uppercase">
+                      {language === 'hi'
+                        ? 'देसी व जैविक उपचार (जीरो या कम खर्च)'
+                        : 'Step 2: Organic & Biological Remedy'}
+                    </h4>
+                    <p className="text-xs text-emerald-800 font-semibold mt-0.5 leading-relaxed">
+                      {activeDiagnosis.organicTreatment}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3: Chemical Dosage */}
+                <div className="flex items-start gap-3 p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200">
+                  <div className="w-7 h-7 rounded-full bg-amber-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-amber-900 uppercase">
+                      {language === 'hi'
+                        ? '15-लीटर स्प्रे पंप के लिए रासायनिक दवा'
+                        : 'Step 3: Chemical Dosage (Per 15L Pump)'}
+                    </h4>
+                    <p className="text-xs text-amber-900 font-bold mt-0.5 leading-relaxed">
+                      {activeDiagnosis.chemicalTreatment}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4: Weather & Precautions */}
+                <div className="flex items-start gap-3 p-3.5 bg-purple-50/70 rounded-2xl border border-purple-200">
+                  <div className="w-7 h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-purple-900 uppercase">
+                      {language === 'hi'
+                        ? 'सावधानी व मौसम सलाह'
+                        : 'Step 4: Weather & Spray Safety'}
+                    </h4>
+                    <p className="text-xs text-purple-800 font-semibold mt-0.5 leading-relaxed">
+                      {activeDiagnosis.precautions ||
+                        (language === 'hi'
+                          ? 'तेज धूप में छिड़काव न करें। यदि 6 घंटे में बारिश का अनुमान हो तो छिड़काव टालें।'
+                          : 'Do not spray during peak midday heat. Avoid spraying if rain is expected.')}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Cause */}
-            <div>
-              <h4 className="text-xs font-bold text-gray-500 uppercase">Pathogen / Cause</h4>
-              <p className="text-xs sm:text-sm text-gray-700 mt-0.5 font-medium leading-relaxed">
-                {activeDiagnosis.cause}
-              </p>
-            </div>
-
-            {/* Organic Treatment */}
-            <div className="rounded-2xl bg-emerald-50 p-3.5 border border-emerald-200">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 uppercase">
-                <span>🌱</span>
-                <span>{t('organicRemedy', 'Organic / Biological Remedy')}</span>
-              </div>
-              <p className="text-xs sm:text-sm text-emerald-800 mt-1 font-semibold leading-relaxed">
-                {activeDiagnosis.organicTreatment}
-              </p>
-            </div>
-
-            {/* Chemical Treatment */}
-            <div className="rounded-2xl bg-amber-50 p-3.5 border border-amber-200">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase">
-                <span>🧪</span>
-                <span>{t('chemicalRemedy', 'Chemical Spray (If Severe)')}</span>
-              </div>
-              <p className="text-xs sm:text-sm text-amber-800 mt-1 font-semibold leading-relaxed">
-                {activeDiagnosis.chemicalTreatment}
-              </p>
-            </div>
-
-            {/* KVK Disclaimer */}
-            <div className="text-[11px] text-gray-500 italic bg-gray-50 p-2.5 rounded-xl border">
-              ℹ️ {t('kvkWarning', 'Caution: For high severity or doubts, contact your local KVK / Agriculture Officer.')}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Geotagged Map Location of Disease Outbreaks */}
+      {/* Geotagged Field Map */}
       <div className="rounded-3xl bg-white p-5 shadow-sm border border-gray-100 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">📍</span>
             <div>
               <h3 className="font-extrabold text-base text-[#186049]">
-                {t('pinnedOnMap', 'Pinned on Your Field Map')}
+                {language === 'hi' ? 'खेत के नक्शे पर रोग का स्थान' : 'Disease Location on Farm Map'}
               </h3>
               <p className="text-xs text-gray-500">
-                Outbreak location tracked on Plot A (Wheat) — allows monitoring spread over time
+                Track where diseases were detected on your plots over time
               </p>
             </div>
           </div>
@@ -368,7 +670,7 @@ export default function DiagnosePage() {
           boundary={PRIMARY_FIELD.boundary}
           subAreas={PRIMARY_FIELD.subPlots}
           pins={mapPins}
-          height="320px"
+          height="300px"
         />
       </div>
     </div>

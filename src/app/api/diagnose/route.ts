@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-interface ClaudeDiagnosisOutput {
+export interface ClaudeDiagnosisOutput {
+  healthScore: number; // 0 to 100
+  healthStatus: 'healthy' | 'moderate' | 'damaged';
   crop: string;
   diseaseName: string;
   regionalName: string;
@@ -8,28 +10,36 @@ interface ClaudeDiagnosisOutput {
   severity: 'low' | 'medium' | 'high';
   cause: string;
   symptoms: string[];
+  immediateAction: string;
   organicTreatment: string;
   chemicalTreatment: string;
+  precautions: string;
   voiceSummary: string;
 }
 
 const SYSTEM_PROMPT = `You are an expert Indian Council of Agricultural Research (ICAR) Plant Pathologist and AI Crop Doctor for "DharaDrishti".
-Your job is to examine an uploaded leaf or plant photo from an Indian farmer and diagnose the condition with high accuracy.
+Your job is to examine an uploaded leaf or crop photo from an Indian farmer and provide a clear, practical diagnosis.
 
-Identify:
-1. Crop type (e.g. Wheat, Rice, Mustard, Cotton, Tomato, Potato, Sugarcane, Maize, Gram, Soybean, etc.)
-2. Disease or Pest Name in English (e.g. Yellow Rust, Early Blight, Powdery Mildew, Stem Borer, Bacterial Leaf Blight, Healthy Crop)
-3. Regional Name in Hindi / Devanagari (e.g. "पीला रतुआ (हळद्या)", "अगेती झुलसा", "सफेद चूर्णी फफूंद")
-4. Severity level ("low" | "medium" | "high")
-5. Confidence percentage (number between 70 and 99)
-6. Cause (fungal pathogen, bacterium, virus, insect pest, or nutrient deficiency with environmental trigger like temperature/humidity)
-7. Symptoms (2-3 concise bullet points)
-8. Organic / Biological Treatment (eco-friendly remedies like 5% Neem Seed Kernel Extract, Trichoderma viride, Cow urine decoction, etc.)
-9. Chemical Treatment (ICAR-approved pesticide/fungicide with exact concentration like 1ml/L water and safety waiting period)
-10. Spoken Voice Summary: A warm, clear 2-sentence summary in the requested farmer language for audio playback.
+Analyze the image and determine:
+1. "healthScore": A health rating from 0 to 100 (90-100 = completely healthy, 65-89 = mild/early symptoms, <65 = damaged/disease outbreak).
+2. "healthStatus": "healthy" | "moderate" | "damaged"
+3. "crop": Crop name (e.g. Wheat, Mustard, Rice, Cotton, Tomato, Potato, Sugarcane, Maize, Gram, Soybean, etc.)
+4. "diseaseName": English pathology name (or "Healthy Crop / No Infection" if no disease is found)
+5. "regionalName": Hindi / Devanagari translation (e.g. "पीला रतुआ", "झुलसा रोग", "स्वस्थ फसल")
+6. "confidence": Percentage (75 to 99)
+7. "severity": "low" | "medium" | "high"
+8. "cause": Concise pathogen/pest cause or "Optimal chlorophyll and leaf vigor" if healthy.
+9. "symptoms": Array of 2-3 visual observations on the leaf.
+10. "immediateAction": Step 1: Immediate action the farmer should take in next 24 hours.
+11. "organicTreatment": Step 2: Desi & biological remedy (e.g. 5% Neem oil, sour buttermilk/छाछ, Trichoderma viride).
+12. "chemicalTreatment": Step 3: Exact chemical dosage measured per 15-liter spray pump (e.g., "15-लीटर की स्प्रे टंकी में 25 मिली प्रोपिकोनाज़ोल"). If healthy, specify "No chemical spray needed - saves farm expenditure."
+13. "precautions": Step 4: Weather & application precautions (e.g. avoid spraying in peak afternoon heat or within 6 hours of rain).
+14. "voiceSummary": 2 friendly, spoken sentences in the requested farmer language for audio playback.
 
-Respond ONLY with a valid JSON object without markdown formatting:
+Respond ONLY with valid JSON (no markdown ticks):
 {
+  "healthScore": number,
+  "healthStatus": "healthy" | "moderate" | "damaged",
   "crop": string,
   "diseaseName": string,
   "regionalName": string,
@@ -37,8 +47,10 @@ Respond ONLY with a valid JSON object without markdown formatting:
   "severity": "low" | "medium" | "high",
   "cause": string,
   "symptoms": string[],
+  "immediateAction": string,
   "organicTreatment": string,
   "chemicalTreatment": string,
+  "precautions": string,
   "voiceSummary": string
 }`;
 
@@ -65,8 +77,10 @@ export async function POST(req: NextRequest) {
       base64Data = parts[1];
     }
 
-    // Fallback diagnosis in case key is missing or external API fails
+    // Default ICAR fallback diagnosis in case of network issue
     const fallbackDiagnosis: ClaudeDiagnosisOutput = {
+      healthScore: 48,
+      healthStatus: 'damaged',
       crop: cropHint || 'Wheat',
       diseaseName: 'Yellow Rust (Stripe Rust)',
       regionalName: 'पीला रतुआ (हळद्या)',
@@ -75,16 +89,28 @@ export async function POST(req: NextRequest) {
       cause: 'Fungal spores (Puccinia striiformis) thriving in 10-15°C dew moisture.',
       symptoms: [
         'Yellow powdery stripes parallel along wheat flag leaves',
-        'Reduced grain filling and premature drying',
+        'Chlorosis and reduced grain filling',
       ],
+      immediateAction:
+        language === 'hi'
+          ? 'खेत में रोगग्रस्त पौधों के पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।'
+          : 'Isolate affected patches and avoid excess moisture accumulation.',
       organicTreatment:
-        'Spray 5% Neem Seed Kernel Extract (NSKE) or Trichoderma harzianum (5g/L water) in early morning.',
+        language === 'hi'
+          ? 'सुबह के समय 5% नीम का अर्क (NSKE) या ट्राइकोडर्मा (5 ग्राम/लीटर) का छिड़काव करें।'
+          : 'Spray 5% Neem Seed Kernel Extract (NSKE) or Trichoderma (5g/L water) in early morning.',
       chemicalTreatment:
-        'If yellow pustules cover > 5% of leaf area: Spray Propiconazole 25% EC (1 ml/L water) immediately.',
+        language === 'hi'
+          ? '15 लीटर की स्प्रे टंकी में 25 मिली प्रोपिकोनाज़ोल 25% EC मिलाकर तुरंत छिड़काव करें।'
+          : 'Mix 25 ml Propiconazole 25% EC per 15-liter spray pump and apply immediately.',
+      precautions:
+        language === 'hi'
+          ? 'तेज धूप में छिड़काव न करें। यदि 6 घंटे में बारिश का अनुमान हो तो छिड़काव टालें।'
+          : 'Do not spray during peak midday heat. Avoid application if rain is expected within 6 hours.',
       voiceSummary:
         language === 'hi'
-          ? 'जांच परिणाम: गेहूं में पीला रतुआ का प्रकोप देखा गया है। तुरंत नीम का तेल या प्रोपिकोनाज़ोल का छिड़काव करें।'
-          : 'Diagnosis: Yellow Rust detected on wheat with 94% confidence. Apply Neem extract or Propiconazole spray.',
+          ? 'फसल स्वास्थ्य स्कोर 48 प्रतिशत है। गेहूं में पीला रतुआ देखा गया है। तुरंत 15 लीटर टंकी में 25 मिली प्रोपिकोनाज़ोल का छिड़काव करें।'
+          : 'Crop health score is 48%. Yellow Rust detected on wheat. Mix 25 ml Propiconazole per 15L spray tank.',
     };
 
     if (!apiKey) {
@@ -103,7 +129,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
+        max_tokens: 1200,
         messages: [
           {
             role: 'user',
@@ -118,7 +144,7 @@ export async function POST(req: NextRequest) {
               },
               {
                 type: 'text',
-                text: `${SYSTEM_PROMPT}\n\nFarmer Language requested for voiceSummary: ${language}\nCrop Hint: ${cropHint || 'Unknown Indian farm crop'}`,
+                text: `${SYSTEM_PROMPT}\n\nFarmer Language for voiceSummary: ${language}\nCrop Hint: ${cropHint || 'Indian farm crop'}`,
               },
             ],
           },
@@ -143,6 +169,13 @@ export async function POST(req: NextRequest) {
     try {
       const cleaned = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
       parsed = JSON.parse(cleaned);
+      // Ensure required fallbacks
+      if (typeof parsed.healthScore !== 'number') {
+        parsed.healthScore = parsed.healthStatus === 'healthy' ? 95 : 50;
+      }
+      if (!parsed.healthStatus) {
+        parsed.healthStatus = parsed.healthScore >= 90 ? 'healthy' : parsed.healthScore >= 65 ? 'moderate' : 'damaged';
+      }
     } catch {
       parsed = fallbackDiagnosis;
     }
@@ -155,15 +188,19 @@ export async function POST(req: NextRequest) {
     console.error('Diagnosis API route error:', error);
     return NextResponse.json({
       diagnosis: {
+        healthScore: 50,
+        healthStatus: 'moderate',
         crop: 'Wheat',
-        diseaseName: 'Yellow Rust (Stripe Rust)',
-        regionalName: 'पीला रतुआ',
-        confidence: 90,
+        diseaseName: 'Leaf Infection',
+        regionalName: 'पत्ती का संक्रमण',
+        confidence: 85,
         severity: 'medium',
-        cause: 'Fungal leaf rust detected.',
-        symptoms: ['Yellow powdery stripes on leaves'],
-        organicTreatment: 'Spray 5% Neem extract.',
-        chemicalTreatment: 'Propiconazole 25% EC (1 ml/L).',
+        cause: 'Fungal or bacterial leaf spots detected.',
+        symptoms: ['Discoloration and spotting on leaf blade'],
+        immediateAction: 'रोगग्रस्त पत्तों की जांच करें।',
+        organicTreatment: 'नीम के तेल (5%) का छिड़काव करें।',
+        chemicalTreatment: '15 लीटर टंकी में 25 मिली अनुशंसित फफूंदनाशक मिलाएं।',
+        precautions: 'हवा की गति शांत होने पर ही छिड़कें।',
         voiceSummary: 'रोग की पहचान पूरी हो गई है।',
       },
       source: 'error_fallback',
