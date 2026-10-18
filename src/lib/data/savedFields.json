@@ -1,0 +1,166 @@
+{
+  "fields": [
+    {
+      "id": "field-01",
+      "name": "Shri Ram Khet (North Farm)",
+      "farmerName": "Ramesh Patel",
+      "village": "Kardelwadi, Shirur",
+      "district": "Pune",
+      "state": "Maharashtra",
+      "khasraNo": "142/A",
+      "totalAreaAcres": 4.8,
+      "boundary": [
+        [18.8252, 74.3721],
+        [18.8278, 74.3735],
+        [18.8265, 74.3768],
+        [18.8239, 74.3752]
+      ],
+      "zones": [
+        {
+          "id": "zone-01",
+          "name": "Zone 1 (North Uplands - Ridge)",
+          "crop": "Wheat",
+          "variety": "Sharbati (GW-322)",
+          "areaAcres": 2.6,
+          "color": "#4A943E",
+          "polygon": [
+            [18.8252, 74.3721],
+            [18.8278, 74.3735],
+            [18.827, 74.375],
+            [18.8247, 74.3735]
+          ],
+          "soil": {
+            "texture": "Clay Loam (Heavy Black Soil)",
+            "nitrogenKgHa": 210,
+            "phosphorusKgHa": 22,
+            "potassiumKgHa": 310,
+            "pH": 7.4,
+            "organicCarbonPercent": 0.62,
+            "moisturePercent": 28,
+            "infiltrationRateMmHr": 12
+          },
+          "vra": {
+            "ureaKgPerAcre": 55,
+            "dapKgPerAcre": 30,
+            "mopKgPerAcre": 10,
+            "irrigationRunTimeMinutes": 25,
+            "irrigationIntervalDays": 4,
+            "pesticideAdvisory": "Preventive 0.5% Neem oil spray for stem borer in upland ridge.",
+            "rationale": "Low soil nitrogen in upland ridge requires targeted top-dressing; heavy clay retains water well so 25 min drip is optimal.",
+            "savingsVsUniform": {
+              "ureaSavedKg": 15,
+              "waterSavedPercent": 22,
+              "costSavedRs": 680
+            }
+          },
+          "cropPlanning": {
+            "primaryCrop": "Wheat (गेहूं)",
+            "suitabilityScore": 94,
+            "alternativeCrops": ["Chickpea (चना)", "Barley (जौ)"],
+            "sownOn": "2026-11-10",
+            "growthStage": "Grain Filling Stage",
+            "daysToHarvest": 14,
+            "harvestReadiness": "Late Stage - Golden Ripening",
+            "estimatedYieldQuintals": 18.5
+          }
+        },
+        {
+          "id": "zone-02",
+          "name": "Zone 2 (Central Valley - High Moisture)",
+          "crop": "Mustard",
+          "variety": "Pusa Bold",
+          "areaAcres": 1.4,
+          "color": "#B98327",
+          "polygon": [
+            [18.8247, 74.3735],
+            [18.827, 74.375],
+            [18.8265, 74.3762],
+            [18.8242, 74.3748]
+          ],
+          "soil": {
+            "texture": "Deep Alluvial Silt",
+            "nitrogenKgHa": 340,
+            "phosphorusKgHa": 18,
+            "potassiumKgHa": 275,
+            "pH": 6.9,
+            "organicCarbonPercent": 0.88,
+            "moisturePercent": 36,
+            "infiltrationRateMmHr": 18
+          },
+          "vra": {
+            "ureaKgPerAcre": 28,
+            "dapKgPerAcre": 20,
+            "mopKgPerAcre": 15,
+            "irrigationRunTimeMinutes": 15,
+            "irrigationIntervalDays": 6,
+            "pesticideAdvisory": "Scout for Alternaria blight due to higher morning micro-canopy humidity.",
+            "rationale": "High organic matter accumulated from topsoil run-off. Cutting urea by 42% prevents crop lodging and reduces nitrate leaching.",
+            "savingsVsUniform": {
+              "ureaSavedKg": 32,
+              "waterSavedPercent": 35,
+              "costSavedRs": 1120
+            }
+          },
+          "cropPlanning": {
+            "primaryCrop": "Mustard (सरसों)",
+            "suitabilityScore": 91,
+            "alternativeCrops": ["Paddy (धान)", "Sugarcane (गन्ना)"],
+            "sownOn": "2026-10-25",
+            "growthStage": "Pod Maturation Stage",
+            "daysToHarvest": 7,
+            "harvestReadiness": "Harvest Ready - 85% Siliquae Brown",
+            "estimatedYieldQuintals": 9.2
+          }
+        },
+        {
+          "id": "zone-03",
+          "name": "Zone 3 (East Slope - Sandy Porous)",
+          "crop": "Chickpea",
+          "variety": "Vijay Desi",
+          "areaAcres": 0.8,
+          "color": "#186049",
+          "polygon": [
+            [18.8242, 74.3748],
+            [18.8265, 74.3762],
+            [18.8265, 74.3768],
+            [18.8239, 74.3752]
+          ],
+          "soil": {
+            "texture": "Sandy Loam (Fast Drainage)",
+            "nitrogenKgHa": 180,
+            "phosphorusKgHa": 28,
+            "potassiumKgHa": 190,
+            "pH": 7.8,
+            "organicCarbonPercent": 0.42,
+            "moisturePercent": 19,
+            "infiltrationRateMmHr": 32
+          },
+          "vra": {
+            "ureaKgPerAcre": 60,
+            "dapKgPerAcre": 20,
+            "mopKgPerAcre": 25,
+            "irrigationRunTimeMinutes": 35,
+            "irrigationIntervalDays": 2,
+            "pesticideAdvisory": "Install pheromone traps for Helicoverpa armigera pod borer.",
+            "rationale": "Porous sandy soil with fast drainage requires 35-min frequent fertigation pulses rather than heavy single doses.",
+            "savingsVsUniform": {
+              "ureaSavedKg": 12,
+              "waterSavedPercent": 18,
+              "costSavedRs": 450
+            }
+          },
+          "cropPlanning": {
+            "primaryCrop": "Chickpea (चना)",
+            "suitabilityScore": 88,
+            "alternativeCrops": ["Groundnut (मूंगफली)", "Millet (बाजरा)"],
+            "sownOn": "2026-11-05",
+            "growthStage": "Pod Formation",
+            "daysToHarvest": 21,
+            "harvestReadiness": "Active Growth",
+            "estimatedYieldQuintals": 5.8
+          }
+        }
+      ]
+    }
+  ]
+}

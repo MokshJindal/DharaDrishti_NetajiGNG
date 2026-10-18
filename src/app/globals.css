@@ -105,3 +105,22 @@ body {
 .leaflet-tooltip.map-tooltip-clean::before {
   border-top-color: #186049 !important;
 }
+
+@keyframes gpsPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px rgba(59, 130, 246, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.gps-beacon-pulse {
+  animation: gpsPulse 1.8s infinite ease-out;
+}
