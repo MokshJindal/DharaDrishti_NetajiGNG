@@ -83,7 +83,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     }`}
                   >
                     <span className="text-xl">{item.icon}</span>
-                    <span>{language === 'hi' ? item.labelHi : item.labelEn}</span>
+                    <span>
+                      {language === 'en'
+                        ? item.labelEn
+                        : `${t(item.key, item.labelHi)} (${item.labelEn})`}
+                    </span>
                   </Link>
                 );
               })}
@@ -125,8 +129,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="text-xl" role="img" aria-hidden="true">
                   {item.icon}
                 </span>
-                <span className="mt-0.5 text-[10px] leading-tight truncate max-w-[56px]">
-                  {language === 'hi' ? item.labelHi : item.labelEn}
+                <span className="mt-0.5 text-[10px] leading-tight truncate max-w-[64px]">
+                  {language === 'en' ? item.labelEn : t(item.key, item.labelHi)}
                 </span>
               </Link>
             );

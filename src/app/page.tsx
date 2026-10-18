@@ -11,7 +11,7 @@ import {
 } from '@/lib/data/mockData';
 
 export default function HomePage() {
-  const { t, language } = useLanguage();
+  const { t, tb, language } = useLanguage();
   const { isListening, toggleListening, speak, lastAction } = useVoice();
 
   const todayWeather = MOCK_WEATHER_FORECAST[0];
@@ -133,18 +133,18 @@ export default function HomePage() {
 
             {/* Main Headline */}
             <h1 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
-              {language === 'hi' ? (
-                <>
-                  स्मार्ट मैपिंग और आवाज से <br />
-                  <span className="text-[#ECE8AF] underline decoration-[#B98327] decoration-4 underline-offset-8">
-                    किसान की सुरक्षा व समृद्धि
-                  </span>
-                </>
-              ) : (
+              {language === 'en' ? (
                 <>
                   Empowering Farmers with <br />
                   <span className="text-[#ECE8AF] underline decoration-[#B98327] decoration-4 underline-offset-8">
                     Smart Mapping & Voice AI
+                  </span>
+                </>
+              ) : (
+                <>
+                  स्मार्ट मैपिंग और आवाज से <br />
+                  <span className="text-[#ECE8AF] underline decoration-[#B98327] decoration-4 underline-offset-8">
+                    किसान की सुरक्षा व समृद्धि (Smart Mapping & Voice AI)
                   </span>
                 </>
               )}
@@ -152,9 +152,9 @@ export default function HomePage() {
 
             {/* Sub-Headline in Clear Language */}
             <p className="mt-4 text-base sm:text-lg font-medium text-emerald-100/90 leading-relaxed max-w-2xl">
-              {language === 'hi'
-                ? 'धरादृष्टि से अपने फोन को लेकर खेत की मेड़ पर चलें, उपग्रह से सटीक एकड़ नापें, पत्ते की फोटो खींचकर रोग ठीक करें और बोलकर मंडी भाव जानें — सब कुछ अपनी मातृभाषा में।'
-                : 'DharaDrishti helps you walk your field boundaries with GPS, check soil health, get instant leaf disease solutions, time irrigation with satellite ET₀, and track mandi profits — in your mother tongue, just by speaking.'}
+              {language === 'en'
+                ? 'DharaDrishti helps you walk your field boundaries with GPS, check soil health, get instant leaf disease solutions, time irrigation with satellite ET₀, and track mandi profits — in your mother tongue, just by speaking.'
+                : 'धरादृष्टि से अपने फोन को लेकर खेत की मेड़ पर चलें, उपग्रह से सटीक एकड़ नापें, पत्ते की फोटो खींचकर रोग ठीक करें और बोलकर मंडी भाव जानें — सब कुछ अपनी मातृभाषा में।'}
             </p>
 
             {/* Prominent Action Buttons */}
@@ -165,7 +165,7 @@ export default function HomePage() {
                 className="flex items-center gap-2.5 rounded-2xl bg-[#4A943E] px-6 py-3.5 text-sm sm:text-base font-black text-white shadow-lg shadow-black/20 hover:bg-[#37732d] hover:scale-105 transition active:scale-95 border border-[#ECE8AF]/30"
               >
                 <span>🗺️</span>
-                <span>{language === 'hi' ? 'खेत का नक्शा देखें' : 'Explore Farm Map'}</span>
+                <span>{language === 'en' ? 'Explore Farm Map' : `${t('exploreMap', 'Explore Farm Map')} (Explore Map)`}</span>
                 <span>→</span>
               </Link>
 
@@ -182,9 +182,9 @@ export default function HomePage() {
                 <span>
                   {isListening
                     ? t('voiceListening', 'Listening…')
-                    : language === 'hi'
-                    ? 'बोलकर पूछें'
-                    : 'Speak to Assistant'}
+                    : language === 'en'
+                    ? 'Ask by Voice'
+                    : `${t('voiceAsk', 'Ask by Voice')} (Voice)`}
                 </span>
               </button>
 
@@ -196,7 +196,7 @@ export default function HomePage() {
               >
                 <span>🔊</span>
                 <span className="hidden sm:inline">
-                  {language === 'hi' ? 'आवाज में सुनें' : 'Audio Brief'}
+                  {language === 'en' ? 'Audio Brief' : `${t('audioBrief', 'Audio Brief')} (Audio)`}
                 </span>
               </button>
             </div>
@@ -225,7 +225,7 @@ export default function HomePage() {
           className="rounded-2xl bg-white p-4 shadow-sm border border-gray-200 hover:border-[#186049] hover:shadow-md transition"
         >
           <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
-            <span>{language === 'hi' ? 'आज का मौसम' : "Today's Weather"}</span>
+            <span>{language === 'en' ? "Today's Weather" : `${t('todaysWeather', 'आज का मौसम')} (Weather)`}</span>
             <span className="text-xl">{todayWeather.icon}</span>
           </div>
           <div className="mt-2 flex items-baseline gap-1">
@@ -243,16 +243,16 @@ export default function HomePage() {
           className="rounded-2xl bg-[#ECE8AF]/50 p-4 shadow-sm border border-[#B98327]/30 hover:border-[#B98327] hover:shadow-md transition"
         >
           <div className="flex items-center justify-between text-xs text-[#186049] font-bold">
-            <span>{language === 'hi' ? 'सिंचाई सलाह' : 'Water Status'}</span>
+            <span>{language === 'en' ? 'Water Status' : `${t('waterStatus', 'सिंचाई सलाह')} (Water)`}</span>
             <span className="text-xl">⛈️</span>
           </div>
           <div className="mt-2">
             <span className="text-base sm:text-lg font-black text-[#B98327] leading-tight block">
-              {language === 'hi' ? 'आज पानी न दें' : 'Skip Watering'}
+              {language === 'en' ? 'Skip Watering' : `${t('skipWatering', 'आज पानी न दें')} (Skip)`}
             </span>
           </div>
           <p className="mt-1 text-xs text-[#186049]/90 font-medium">
-            {language === 'hi' ? 'कल 18 मिमी बारिश होगी' : '18mm rain expected tomorrow'}
+            {language === 'en' ? '18mm rain expected tomorrow' : t('rainExpectedTomorrow', 'कल 18 मिमी बारिश होगी')}
           </p>
         </Link>
 
@@ -262,17 +262,19 @@ export default function HomePage() {
           className="rounded-2xl bg-white p-4 shadow-sm border border-gray-200 hover:border-[#4A943E] hover:shadow-md transition"
         >
           <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
-            <span>{language === 'hi' ? 'शिरूर मंडी भाव (गेहूं)' : 'APMC Wheat Rate'}</span>
+            <span>{language === 'en' ? 'APMC Wheat Rate' : `${t('mandiRateCard', 'शिरूर मंडी भाव (गेहूं)')} (Mandi)`}</span>
             <span className="text-xs font-bold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">
               ▲ +₹60
             </span>
           </div>
           <div className="mt-2 flex items-baseline gap-1">
             <span className="text-2xl sm:text-3xl font-black text-[#186049]">₹2,480</span>
-            <span className="text-xs text-gray-500 font-medium">/ क्विंटल</span>
+            <span className="text-xs text-gray-500 font-medium">
+              {language === 'en' ? '/ quintal' : t('perQuintal', '/ क्विंटल')}
+            </span>
           </div>
           <p className="mt-1 text-xs text-gray-600 font-medium">
-            {language === 'hi' ? 'एमएसपी: ₹2,425 • लाभ: ₹42,500/एकड़' : 'MSP: ₹2,425 • Net Profit: ₹42.5k'}
+            {language === 'en' ? 'MSP: ₹2,425 • Net Profit: ₹42.5k' : t('mspGain', 'एमएसपी: ₹2,425 • लाभ: ₹42,500/एकड़')}
           </p>
         </Link>
 
@@ -282,7 +284,7 @@ export default function HomePage() {
           className="rounded-2xl bg-white p-4 shadow-sm border border-gray-200 hover:border-[#186049] hover:shadow-md transition"
         >
           <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
-            <span>{language === 'hi' ? 'खेत स्वास्थ्य स्कोर' : 'Fasal Health'}</span>
+            <span>{language === 'en' ? 'Farm Health' : `${t('fasalHealthScore', 'खेत स्वास्थ्य स्कोर')} (Score)`}</span>
             <span className="text-xs font-bold text-[#186049] bg-[#ECE8AF] px-2 py-0.5 rounded-full">
               {MOCK_FASAL_SCORE_DETAILS.grade}
             </span>
@@ -304,12 +306,12 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-[#186049] tracking-tight">
-              {language === 'hi' ? 'प्रमुख किसान सेवाएं' : 'Key Farm Services'}
+              {language === 'en' ? 'Key Farm Services' : `${t('keyFarmServices', 'प्रमुख किसान सेवाएं')} (Services)`}
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 font-medium">
-              {language === 'hi'
-                ? 'सभी सुविधाएं बोलकर या स्क्रीन छूकर आसानी से इस्तेमाल करें'
-                : 'All features easily operated via voice command or touch'}
+              {language === 'en'
+                ? 'All features easily operated via voice command or touch'
+                : t('servicesSubtitle', 'सभी सुविधाएं बोलकर या स्क्रीन छूकर आसानी से इस्तेमाल करें')}
             </p>
           </div>
           <span className="text-xs font-bold text-[#B98327] bg-[#ECE8AF]/60 px-3 py-1 rounded-full self-start sm:self-auto">
@@ -330,18 +332,18 @@ export default function HomePage() {
                     {card.icon}
                   </span>
                   <span className="text-xs font-extrabold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 group-hover:bg-[#ECE8AF] group-hover:text-[#186049] transition">
-                    {language === 'hi' ? card.tagHi : card.tagEn}
+                    {language === 'en' ? card.tagEn : card.tagHi}
                   </span>
                 </div>
 
                 {/* Title */}
                 <h3 className="mt-4 text-lg font-black text-[#186049] group-hover:text-[#4A943E] transition leading-snug">
-                  {language === 'hi' ? card.titleHi : card.titleEn}
+                  {language === 'en' ? card.titleEn : `${card.titleHi} (${card.titleEn})`}
                 </h3>
 
                 {/* Description */}
                 <p className="mt-2 text-xs sm:text-sm text-gray-600 font-medium leading-relaxed">
-                  {language === 'hi' ? card.descHi : card.descEn}
+                  {language === 'en' ? card.descEn : card.descHi}
                 </p>
               </div>
 
@@ -354,7 +356,7 @@ export default function HomePage() {
                   href={card.href}
                   className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white shadow-sm transition active:scale-95 ${card.btnBg}`}
                 >
-                  <span>{language === 'hi' ? 'खोलें' : 'Open'}</span>
+                  <span>{language === 'en' ? 'Open' : `${t('openAction', 'खोलें')} (Open)`}</span>
                   <span>→</span>
                 </Link>
               </div>
@@ -371,10 +373,12 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <span className="text-2xl">📢</span>
             <h3 className="text-base sm:text-lg font-black text-[#186049]">
-              {language === 'hi' ? 'कृषि विज्ञान केंद्र (KVK) दैनिक सलाह' : 'KVK Agricultural Advisory'}
+              {language === 'en' ? 'KVK Agricultural Advisory' : `${t('kvkAdvisoryTitle', 'कृषि विज्ञान केंद्र (KVK) दैनिक सलाह')} (KVK)`}
             </h3>
           </div>
-          <span className="text-xs font-bold text-gray-500">पुणे जिला (Pune)</span>
+          <span className="text-xs font-bold text-gray-500">
+            {language === 'en' ? 'Pune District' : 'पुणे जिला (Pune)'}
+          </span>
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -382,20 +386,20 @@ export default function HomePage() {
             <span className="text-2xl">⚠️</span>
             <div className="flex-1">
               <h4 className="text-sm font-black text-amber-900">
-                {language === 'hi' ? 'कीटनाशक छिड़काव चेतावनी' : 'Spray Weather Warning'}
+                {language === 'en' ? 'Spray Weather Warning' : 'कीटनाशक छिड़काव चेतावनी (Spray Alert)'}
               </h4>
               <p className="mt-1 text-xs text-amber-800 font-medium leading-relaxed">
-                {language === 'hi'
-                  ? 'कल दोपहर 25 किमी/घंटा रफ्तार से हवा चलने व हल्की बूंदाबांदी का अनुमान है। कीटनाशक न छिड़कें — दवा बहने से पैसे का नुकसान होगा।'
-                  : 'Gusty winds (25 km/h) and showers expected tomorrow afternoon. Do not spray chemicals — runoff will waste expensive sprays.'}
+                {language === 'en'
+                  ? 'Gusty winds (25 km/h) and showers expected tomorrow afternoon. Do not spray chemicals — runoff will waste expensive sprays.'
+                  : 'कल दोपहर 25 किमी/घंटा रफ्तार से हवा चलने व हल्की बूंदाबांदी का अनुमान है। कीटनाशक न छिड़कें — दवा बहने से पैसे का नुकसान होगा।'}
               </p>
             </div>
             <button
               onClick={() =>
                 speak(
-                  language === 'hi'
-                    ? 'कल दोपहर हवा और बारिश का अनुमान है। कीटनाशक का छिड़काव न करें।'
-                    : 'Do not spray pesticides tomorrow due to winds and rain.'
+                  language === 'en'
+                    ? 'Do not spray pesticides tomorrow due to winds and rain.'
+                    : 'कल दोपहर हवा और बारिश का अनुमान है। कीटनाशक का छिड़काव न करें।'
                 )
               }
               className="rounded-xl bg-amber-200/80 px-2.5 py-1.5 text-xs font-black text-amber-900 shadow-sm"
@@ -409,19 +413,19 @@ export default function HomePage() {
             <span className="text-2xl">🌾</span>
             <div className="flex-1">
               <h4 className="text-sm font-black text-emerald-900">
-                {language === 'hi' ? 'पीला रतुआ (Yellow Rust) निगरानी' : 'Pest Watch: Yellow Rust'}
+                {language === 'en' ? 'Pest Watch: Yellow Rust' : 'पीला रतुआ निगरानी (Yellow Rust Watch)'}
               </h4>
               <p className="mt-1 text-xs text-emerald-800 font-medium leading-relaxed">
-                {language === 'hi'
-                  ? 'शिरूर ब्लॉक में गेहूं पर पीले रतुए की हल्की शिकायतें आई हैं। सुबह के समय पत्तों पर पीली धारियां जांचें। संदेह हो तो फोटो खींचकर डॉक्टर में अपलोड करें।'
-                  : 'Minor yellow rust notices reported in Shirur block. Inspect morning flag leaves. Scan via Leaf Doctor for instant cure.'}
+                {language === 'en'
+                  ? 'Minor yellow rust notices reported in Shirur block. Inspect morning flag leaves. Scan via Leaf Doctor for instant cure.'
+                  : 'शिरूर ब्लॉक में गेहूं पर पीले रतुए की हल्की शिकायतें आई हैं। सुबह के समय पत्तों पर पीली धारियां जांचें। संदेह हो तो फोटो खींचकर डॉक्टर में अपलोड करें।'}
               </p>
             </div>
             <Link
               href="/diagnose"
               className="rounded-xl bg-emerald-200/80 px-3 py-1.5 text-xs font-black text-emerald-900 shadow-sm self-center whitespace-nowrap"
             >
-              {language === 'hi' ? 'पत्ता जांचें' : 'Scan Leaf'}
+              {language === 'en' ? 'Scan Leaf' : `${t('scanLeaf', 'पत्ता जांचें')} (Scan)`}
             </Link>
           </div>
         </div>
@@ -437,12 +441,12 @@ export default function HomePage() {
           </div>
           <div>
             <h3 className="text-lg font-black text-white">
-              {language === 'hi' ? '24x7 कृषि मित्र AI से बात करें' : 'Talk to Krishi Mitra 24x7 AI'}
+              {language === 'en' ? 'Talk to Krishi Mitra 24x7 AI' : `${t('talkToKrishiMitra', '24x7 कृषि मित्र AI से बात करें')} (Krishi AI)`}
             </h3>
             <p className="text-xs sm:text-sm text-[#ECE8AF] font-medium">
-              {language === 'hi'
-                ? 'बीज, खाद, सब्सिडी, मंडी भाव या फसल रोग के बारे में कोई भी सवाल बोलकर पूछें'
-                : 'Ask anything about seeds, fertilizers, government schemes, or plant health in your mother tongue'}
+              {language === 'en'
+                ? 'Ask anything about seeds, fertilizers, government schemes, or plant health in your mother tongue'
+                : t('krishiMitraSub', 'बीज, खाद, सब्सिडी, मंडी भाव या फसल रोग के बारे में कोई भी सवाल बोलकर पूछें')}
             </p>
           </div>
         </div>
@@ -452,13 +456,15 @@ export default function HomePage() {
             href="/chat"
             className="flex-1 md:flex-initial text-center rounded-xl bg-white px-5 py-3 text-xs sm:text-sm font-black text-[#186049] shadow hover:bg-[#ECE8AF] transition active:scale-95"
           >
-            {language === 'hi' ? 'कृषि मित्र से चैट करें' : 'Open AI Chat'}
+            {language === 'en' ? 'Open AI Chat' : `${t('chatWithKrishiMitra', 'कृषि मित्र से चैट करें')} (Chat)`}
           </Link>
           <button
             onClick={toggleListening}
             className="flex-1 md:flex-initial text-center rounded-xl bg-[#B98327] px-5 py-3 text-xs sm:text-sm font-black text-white shadow hover:bg-[#92651b] transition active:scale-95"
           >
-            {isListening ? 'सुन रहे हैं…' : 'बोलकर पूछें 🎙️'}
+            {isListening
+              ? (language === 'en' ? 'Listening…' : t('listening', 'सुन रहे हैं…'))
+              : (language === 'en' ? 'Ask by Voice 🎙️' : `${t('voiceAsk', 'बोलकर पूछें')} (Voice) 🎙️`)}
           </button>
         </div>
       </section>

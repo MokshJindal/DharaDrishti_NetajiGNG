@@ -73,9 +73,11 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
                 <span className="text-xl sm:text-2xl font-black tracking-tight text-[#186049]">
                   DharaDrishti
                 </span>
-                <span className="text-lg sm:text-xl font-extrabold text-[#B98327]">
-                  धरादृष्टि
-                </span>
+                {language !== 'en' && (
+                  <span className="text-lg sm:text-xl font-extrabold text-[#B98327]">
+                    {currentLang.nativeName}
+                  </span>
+                )}
               </div>
               <p className="hidden xs:block text-[10px] sm:text-[11px] font-semibold text-gray-600 tracking-wide">
                 VOICE-FIRST SMART AGRI-GIS & SATELLITE PLATFORM
@@ -167,7 +169,7 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
             >
               <span className="text-base sm:text-lg">🎙️</span>
               <span className="hidden sm:inline">
-                {isListening ? t('voiceListening', 'Listening…') : 'बोलकर पूछें'}
+                {isListening ? t('voiceListening', 'Listening…') : t('voiceAsk', 'Ask by Voice')}
               </span>
             </button>
 
@@ -177,8 +179,8 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
               className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-[#4A943E] text-white text-xs sm:text-sm font-extrabold shadow hover:bg-[#37732d] transition active:scale-95"
             >
               <span>🗺️</span>
-              <span className="hidden xs:inline">खेत का नक्शा</span>
-              <span className="xs:hidden">नक्शा</span>
+              <span className="hidden xs:inline">{t('fieldMapCTA', 'Field Map')}</span>
+              <span className="xs:hidden">Map</span>
             </Link>
 
             {/* Mobile Hamburger Menu Toggle */}
@@ -203,6 +205,10 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
           <ul className="flex items-center gap-1 py-1.5 overflow-x-auto scrollbar-none">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
+              const label =
+                language === 'en'
+                  ? link.labelEn
+                  : `${t(link.key, link.labelHi)} (${link.labelEn})`;
               return (
                 <li key={link.key}>
                   <Link
@@ -214,7 +220,7 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
                     }`}
                   >
                     <span className="text-sm">{link.icon}</span>
-                    <span>{language === 'hi' ? link.labelHi : link.labelEn}</span>
+                    <span>{label}</span>
                     {active && <span className="h-1.5 w-1.5 rounded-full bg-[#186049]" />}
                   </Link>
                 </li>

@@ -15,7 +15,8 @@ const MapComponent = dynamic(() => import('@/components/map/MapComponent'), {
 const SAMPLE_LEAVES = [
   {
     id: 'demo-healthy',
-    title: 'स्वस्थ गेहूं (Healthy)',
+    titleHi: 'स्वस्थ गेहूं (Healthy)',
+    titleEn: 'Healthy Wheat',
     subtitle: 'Healthy Wheat Leaf',
     crop: 'Wheat',
     status: 'healthy' as const,
@@ -25,7 +26,8 @@ const SAMPLE_LEAVES = [
   },
   {
     id: 'demo-rust',
-    title: 'पीला रतुआ (Yellow Rust)',
+    titleHi: 'पीला रतुआ (Yellow Rust)',
+    titleEn: 'Yellow Rust',
     subtitle: 'Wheat Stripe Rust',
     crop: 'Wheat',
     status: 'damaged' as const,
@@ -35,7 +37,8 @@ const SAMPLE_LEAVES = [
   },
   {
     id: 'demo-blight',
-    title: 'झुलसा रोग (Leaf Blight)',
+    titleHi: 'झुलसा रोग (Leaf Blight)',
+    titleEn: 'Leaf Blight',
     subtitle: 'Mustard Alternaria Blight',
     crop: 'Mustard',
     status: 'moderate' as const,
@@ -326,14 +329,14 @@ export default function DiagnosePage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={sample.image}
-                  alt={sample.title}
+                  alt={language === 'en' ? sample.titleEn : sample.titleHi}
                   className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                 />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-800 truncate">
-                    {sample.title}
+                    {language === 'en' ? sample.titleEn : sample.titleHi}
                   </span>
                   <span
                     className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
@@ -480,10 +483,16 @@ export default function DiagnosePage() {
 
               <p className="text-xs text-gray-700 mt-2 font-medium">
                 {isHealthy
-                  ? 'फसल में कोई गंभीर बीमारी नहीं है। किसी भी रासायनिक छिड़काव की आवश्यकता नहीं है।'
+                  ? (language === 'en'
+                      ? 'No severe disease detected. No chemical spray needed.'
+                      : 'फसल में कोई गंभीर बीमारी नहीं है। किसी भी रासायनिक छिड़काव की आवश्यकता नहीं है।')
                   : isModerate
-                  ? 'पत्तियों पर धब्बे दिखने लगे हैं। तुरंत जैविक उपचार करें ताकि रोग न फैले।'
-                  : 'सक्रिय रोग का प्रकोप देखा गया है। फसल बचाने के लिए तुरंत अनुशंसित दवा का छिड़काव करें।'}
+                  ? (language === 'en'
+                      ? 'Early leaf spotting observed. Apply biological remedy promptly to prevent spreading.'
+                      : 'पत्तियों पर धब्बे दिखने लगे हैं। तुरंत जैविक उपचार करें ताकि रोग न फैले।')
+                  : (language === 'en'
+                      ? 'Active pathogen infection detected. Apply recommended treatment immediately to protect yield.'
+                      : 'सक्रिय रोग का प्रकोप देखा गया है। फसल बचाने के लिए तुरंत अनुशंसित दवा का छिड़काव करें।')}
               </p>
             </div>
           )}
@@ -514,9 +523,9 @@ export default function DiagnosePage() {
                       stopSpeaking();
                     } else {
                       const msg =
-                        language === 'hi'
-                          ? `फसल स्वास्थ्य स्कोर ${healthScore} प्रतिशत है। स्थिति: ${activeDiagnosis.diseaseName} (${activeDiagnosis.regionalName})। पहला कदम: ${activeDiagnosis.immediateAction || 'रोगग्रस्त पत्तों को हटाएं'}। दवा: ${activeDiagnosis.chemicalTreatment}`
-                          : `Health score is ${healthScore}%. Disease: ${activeDiagnosis.diseaseName}. Immediate action: ${activeDiagnosis.immediateAction || 'Check leaf patches'}. Chemical spray: ${activeDiagnosis.chemicalTreatment}`;
+                        language === 'en'
+                          ? `Health score is ${healthScore}%. Disease: ${activeDiagnosis.diseaseName}. Immediate action: ${activeDiagnosis.immediateAction || 'Check leaf patches'}. Chemical spray: ${activeDiagnosis.chemicalTreatment}`
+                          : `फसल स्वास्थ्य स्कोर ${healthScore} प्रतिशत है। स्थिति: ${activeDiagnosis.diseaseName} (${activeDiagnosis.regionalName})। पहला कदम: ${activeDiagnosis.immediateAction || 'रोगग्रस्त पत्तों को हटाएं'}। दवा: ${activeDiagnosis.chemicalTreatment}`;
                       speak(msg);
                     }
                   }}
@@ -529,8 +538,8 @@ export default function DiagnosePage() {
                   <span className="text-base">{isSpeaking ? '⏹️' : '🔊'}</span>
                   <span>
                     {isSpeaking
-                      ? (language === 'hi' ? 'बोलना बंद करें' : 'Stop Speaking')
-                      : (language === 'hi' ? 'आवाज़ में सलाह सुनें' : 'Listen to Advice')}
+                      ? (language === 'en' ? 'Stop Speaking' : 'बोलना बंद करें (Stop)')
+                      : (language === 'en' ? 'Listen to Advice' : 'आवाज़ में सलाह सुनें (Audio)')}
                   </span>
                 </button>
               </div>
@@ -538,7 +547,7 @@ export default function DiagnosePage() {
               {/* Cause & Symptoms */}
               <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-100">
                 <span className="text-[11px] font-bold text-gray-500 uppercase">
-                  संक्रमण का कारण (Pathogen / Cause)
+                  {language === 'en' ? 'Pathogen & Cause' : 'संक्रमण का कारण (Pathogen / Cause)'}
                 </span>
                 <p className="text-xs text-gray-800 font-medium mt-0.5 leading-relaxed">
                   {activeDiagnosis.cause}
@@ -562,9 +571,9 @@ export default function DiagnosePage() {
                 <h3 className="text-sm font-extrabold text-[#186049] uppercase tracking-wider flex items-center gap-1.5">
                   <span>📋</span>
                   <span>
-                    {language === 'hi'
-                      ? 'किसान कार्य योजना (अब क्या करें? - 4 आसान चरण)'
-                      : 'Farmer Action Plan (What to Do Now)'}
+                    {language === 'en'
+                      ? 'Farmer Action Plan (4 Step Guide)'
+                      : 'किसान कार्य योजना (Farmer Action Plan - 4 Steps)'}
                   </span>
                 </h3>
 
@@ -575,15 +584,15 @@ export default function DiagnosePage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-blue-900 uppercase">
-                      {language === 'hi'
-                        ? 'पहला कदम: अगले 24 घंटे में'
-                        : 'Step 1: Immediate Action (Next 24h)'}
+                      {language === 'en'
+                        ? 'Step 1: Immediate Action (Next 24h)'
+                        : 'पहला कदम (Step 1: Immediate Action)'}
                     </h4>
                     <p className="text-xs text-blue-800 font-semibold mt-0.5 leading-relaxed">
                       {activeDiagnosis.immediateAction ||
-                        (language === 'hi'
-                          ? 'खेत में रोगग्रस्त पौधों के पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।'
-                          : 'Isolate affected plant patches and avoid excess standing moisture.')}
+                        (language === 'en'
+                          ? 'Isolate affected plant patches and avoid excess standing moisture.'
+                          : 'खेत में रोगग्रस्त पौधों के पत्तों को अलग करें और मेड़ों पर जलभराव न होने दें।')}
                     </p>
                   </div>
                 </div>
@@ -595,9 +604,9 @@ export default function DiagnosePage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-emerald-900 uppercase">
-                      {language === 'hi'
-                        ? 'देसी व जैविक उपचार (जीरो या कम खर्च)'
-                        : 'Step 2: Organic & Biological Remedy'}
+                      {language === 'en'
+                        ? 'Step 2: Organic & Biological Remedy'
+                        : 'देसी व जैविक उपचार (Step 2: Organic Remedy)'}
                     </h4>
                     <p className="text-xs text-emerald-800 font-semibold mt-0.5 leading-relaxed">
                       {activeDiagnosis.organicTreatment}
@@ -612,9 +621,9 @@ export default function DiagnosePage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-amber-900 uppercase">
-                      {language === 'hi'
-                        ? '15-लीटर स्प्रे पंप के लिए रासायनिक दवा'
-                        : 'Step 3: Chemical Dosage (Per 15L Pump)'}
+                      {language === 'en'
+                        ? 'Step 3: Chemical Dosage (Per 15L Pump)'
+                        : 'रासायनिक दवा (Step 3: Chemical Spray)'}
                     </h4>
                     <p className="text-xs text-amber-900 font-bold mt-0.5 leading-relaxed">
                       {activeDiagnosis.chemicalTreatment}
@@ -629,15 +638,15 @@ export default function DiagnosePage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-purple-900 uppercase">
-                      {language === 'hi'
-                        ? 'सावधानी व मौसम सलाह'
-                        : 'Step 4: Weather & Spray Safety'}
+                      {language === 'en'
+                        ? 'Step 4: Weather & Spray Safety'
+                        : 'सावधानी व मौसम सलाह (Step 4: Spray Safety)'}
                     </h4>
                     <p className="text-xs text-purple-800 font-semibold mt-0.5 leading-relaxed">
                       {activeDiagnosis.precautions ||
-                        (language === 'hi'
-                          ? 'तेज धूप में छिड़काव न करें। यदि 6 घंटे में बारिश का अनुमान हो तो छिड़काव टालें।'
-                          : 'Do not spray during peak midday heat. Avoid spraying if rain is expected.')}
+                        (language === 'en'
+                          ? 'Do not spray during peak midday heat. Avoid spraying if rain is expected.'
+                          : 'तेज धूप में छिड़काव न करें। यदि 6 घंटे में बारिश का अनुमान हो तो छिड़काव टालें।')}
                     </p>
                   </div>
                 </div>

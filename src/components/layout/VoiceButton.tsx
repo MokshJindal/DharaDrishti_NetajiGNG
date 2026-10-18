@@ -6,21 +6,29 @@ import { useVoice } from '@/lib/voice/VoiceContext';
 
 const VOICE_COMMANDS_BY_LANG: Record<string, { label: string; cmd: string; icon: string }[]> = {
   hi: [
-    { label: 'खेत और मेड़ नापो', cmd: 'खेत दिखाओ', icon: '🗺️' },
-    { label: 'पत्ती की बीमारी जांचो', cmd: 'पत्ती की बीमारी', icon: '🔬' },
-    { label: 'सिंचाई और पानी सलाह', cmd: 'पानी कब लगाएं', icon: '💧' },
-    { label: 'खाद और पोषण की मात्रा', cmd: 'खाद की मात्रा', icon: '🧪' },
-    { label: 'ताज़ा मंडी भाव', cmd: 'मंडी भाव', icon: '💰' },
-    { label: 'आज और कल का मौसम', cmd: 'मौसम बताओ', icon: '⛅' },
-    { label: 'मेरा फसल क्रेडिट स्कोर', cmd: 'फसल स्कोर', icon: '📊' },
+    { label: 'खेत और मेड़ नापो (Field Map)', cmd: 'खेत दिखाओ', icon: '🗺️' },
+    { label: 'पत्ती की बीमारी जांचो (Leaf Doctor)', cmd: 'पत्ती की बीमारी', icon: '🔬' },
+    { label: 'सिंचाई और पानी सलाह (Irrigation)', cmd: 'पानी कब लगाएं', icon: '💧' },
+    { label: 'खाद और NPK मात्रा (Fertiliser)', cmd: 'खाद की मात्रा', icon: '🧪' },
+    { label: 'ताज़ा मंडी भाव (Mandi Rates)', cmd: 'मंडी भाव', icon: '💰' },
+    { label: 'आज और कल का मौसम (Weather)', cmd: 'मौसम बताओ', icon: '⛅' },
+    { label: 'फसल क्रेडिट स्कोर (Fasal Score)', cmd: 'फसल स्कोर', icon: '📊' },
   ],
   pa: [
-    { label: 'ਖੇਤ ਅਤੇ ਹੱਦ ਵੇਖੋ', cmd: 'ਖੇਤ ਦਿਖਾਓ', icon: '🗺️' },
-    { label: 'ਫ਼ਸਲ ਦੀ ਬਿਮਾਰੀ ਜਾਂਚ', cmd: 'ਬਿਮਾਰੀ ਜਾਂਚ', icon: '🔬' },
-    { label: 'ਸਿੰਚਾਈ ਅਤੇ ਪਾਣੀ', cmd: 'ਪਾਣੀ ਕਦੋਂ ਲਾਈਏ', icon: '💧' },
-    { label: 'ਖਾਦ ਦੀ ਮਾਤਰਾ', cmd: 'ਖਾਦ ਦੀ ਮਾਤਰਾ', icon: '🧪' },
-    { label: 'ਮੰਡੀ ਦਾ ਰੇਟ', cmd: 'ਮੰਡੀ ਰੇਟ', icon: '💰' },
-    { label: 'ਮੌਸਮ ਦਾ ਹਾਲ', cmd: 'ਮੌਸਮ ਦੱਸੋ', icon: '⛅' },
+    { label: 'ਖੇਤ ਅਤੇ ਹੱਦ ਵੇਖੋ (Field Map)', cmd: 'ਖੇਤ ਦਿਖਾਓ', icon: '🗺️' },
+    { label: 'ਫ਼ਸਲ ਦੀ ਬਿਮਾਰੀ ਜਾਂਚ (Leaf Doctor)', cmd: 'ਬਿਮਾਰੀ ਜਾਂਚ', icon: '🔬' },
+    { label: 'ਸਿੰਚਾਈ ਅਤੇ ਪਾਣੀ (Irrigation)', cmd: 'ਪਾਣੀ ਕਦੋਂ ਲਾਈਏ', icon: '💧' },
+    { label: 'ਖਾਦ ਦੀ ਮਾਤਰਾ (Fertiliser)', cmd: 'ਖਾਦ ਦੀ ਮਾਤਰਾ', icon: '🧪' },
+    { label: 'ਮੰਡੀ ਦਾ ਰੇਟ (Mandi Rates)', cmd: 'ਮੰਡੀ ਰੇਟ', icon: '💰' },
+    { label: 'ਮੌਸਮ ਦਾ ਹਾਲ (Weather)', cmd: 'ਮੌਸਮ ਦੱਸੋ', icon: '⛅' },
+  ],
+  mr: [
+    { label: 'शेताचा नकाशा व सीमा (Field Map)', cmd: 'शेत दाखवा', icon: '🗺️' },
+    { label: 'पीक रोग निदान (Leaf Doctor)', cmd: 'रोगाची तपासणी', icon: '🔬' },
+    { label: 'पाणी व सिंचन सल्ला (Irrigation)', cmd: 'पाणी कधी द्यायचे', icon: '💧' },
+    { label: 'खतांची मात्रा (Fertiliser)', cmd: 'खत मात्रा', icon: '🧪' },
+    { label: 'बाजार भाव (Mandi Rates)', cmd: 'मंडी भाव', icon: '💰' },
+    { label: 'हवामान माहिती (Weather)', cmd: 'हवामान सांगा', icon: '⛅' },
   ],
   en: [
     { label: 'Measure Field Boundary', cmd: 'Show my fields', icon: '🗺️' },
@@ -97,25 +105,25 @@ export default function VoiceButton() {
             <span className="text-[11px] font-bold tracking-wider uppercase text-[#186049] flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
               {isListening
-                ? (language === 'hi' ? 'सुन रहा हूँ...' : 'Listening...')
+                ? (language === 'en' ? 'Listening...' : 'सुन रहा हूँ... (Listening)')
                 : isProcessing
-                ? (language === 'hi' ? 'AI समझ रहा है...' : 'Analyzing voice command...')
-                : (language === 'hi' ? 'बोल रहा हूँ...' : 'Speaking...')}
+                ? (language === 'en' ? 'Analyzing voice command...' : 'AI समझ रहा है... (Analyzing)')
+                : (language === 'en' ? 'Speaking...' : 'बोल रहा हूँ... (Speaking)')}
             </span>
             {isSpeaking && (
               <button
                 onClick={stopSpeaking}
                 className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full hover:bg-amber-200"
               >
-                {language === 'hi' ? 'चुप रहें' : 'Stop'}
+                {language === 'en' ? 'Stop' : 'चुप रहें (Stop)'}
               </button>
             )}
           </div>
           <p className="text-xs text-gray-800 font-medium leading-relaxed">
             {transcript ||
               (isProcessing
-                ? (language === 'hi' ? 'आदेश का विश्लेषण जारी है...' : 'Routing to feature...')
-                : (language === 'hi' ? 'कृपया अपना सवाल या आदेश बोलें...' : 'Speak your command...'))}
+                ? (language === 'en' ? 'Routing to feature...' : 'आदेश का विश्लेषण जारी है... (Routing)')
+                : (language === 'en' ? 'Speak your command...' : 'कृपया अपना सवाल या आदेश बोलें... (Speak)'))}
           </p>
           <div className="absolute -bottom-1.5 right-6 h-3 w-3 rotate-45 bg-white border-b border-r border-gray-100" />
         </div>
@@ -127,16 +135,18 @@ export default function VoiceButton() {
           <div className="bg-[#186049] text-white px-4 py-2.5 flex items-center justify-between">
             <div>
               <p className="text-xs font-bold">
-                {language === 'hi'
-                  ? 'बोलने के उदाहरण'
+                {language === 'en'
+                  ? 'Voice Command Shortcuts'
                   : language === 'pa'
-                  ? 'ਬੋਲਣ ਦੀਆਂ ਉਦਾਹਰਣਾਂ'
-                  : 'Voice Command Shortcuts'}
+                  ? 'ਬੋਲਣ ਦੀਆਂ ਉਦਾਹਰਣਾਂ (Shortcuts)'
+                  : language === 'mr'
+                  ? 'बोलण्याचे उदाहरण (Shortcuts)'
+                  : 'बोलने के उदाहरण (Voice Shortcuts)'}
               </p>
               <p className="text-[10px] text-emerald-100 opacity-90">
-                {language === 'hi'
-                  ? 'माइक दबाकर कोई भी वाक्य बोलें'
-                  : 'Tap the mic and speak in your language'}
+                {language === 'en'
+                  ? 'Tap the mic and speak in your language'
+                  : 'माइक दबाकर अपनी भाषा में बोलें (Tap & Speak)'}
               </p>
             </div>
             <button
@@ -175,10 +185,10 @@ export default function VoiceButton() {
           onPointerLeave={handlePointerUp}
           aria-label={
             isSpeaking
-              ? (language === 'hi' ? 'बोलना बंद करें' : 'Stop speaking')
+              ? (language === 'en' ? 'Stop speaking' : 'बोलना बंद करें (Stop)')
               : isListening
-              ? (language === 'hi' ? 'सुनना बंद करें' : 'Stop listening')
-              : (language === 'hi' ? 'बोलकर काम करें' : 'Start voice navigator')
+              ? (language === 'en' ? 'Stop listening' : 'सुनना बंद करें (Stop)')
+              : (language === 'en' ? 'Start voice navigator' : 'बोलकर काम करें (Voice)')
           }
           className={`flex h-14 w-14 items-center justify-center rounded-full shadow-2xl transition-all duration-300 active:scale-95 border-2 ${
             isSpeaking
@@ -251,9 +261,9 @@ export default function VoiceButton() {
         {/* Quick tooltip on desktop hover */}
         {!isListening && !isSpeaking && !showSuggestions && (
           <div className="hidden md:group-hover:flex absolute right-16 top-2.5 items-center bg-gray-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-            <span>{language === 'hi' ? 'बोलें (Voice)' : 'Speak Voice Command'}</span>
+            <span>{language === 'en' ? 'Speak Voice Command' : 'बोलकर पूछें (Voice Navigator)'}</span>
             <span className="ml-2 text-[10px] text-gray-400">
-              {language === 'hi' ? 'दबाए रखें: विकल्प' : 'Hold: examples'}
+              {language === 'en' ? 'Hold: examples' : 'दबाए रखें: विकल्प (Hold)'}
             </span>
           </div>
         )}

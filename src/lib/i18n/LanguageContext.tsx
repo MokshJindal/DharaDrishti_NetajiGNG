@@ -12,6 +12,7 @@ interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (lang: LanguageCode) => void;
   t: (key: string, fallback?: string) => string;
+  tb: (key: string, fallbackEn?: string) => string;
   languages: LanguageInfo[];
   currentLanguageInfo: LanguageInfo;
 }
@@ -19,7 +20,8 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<LanguageCode>('hi'); // Default to Hindi for Indian farmers
+  // Default language is English as required
+  const [language, setLanguageState] = useState<LanguageCode>('en');
 
   useEffect(() => {
     try {
@@ -41,11 +43,27 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Standard single translation
   const t = useCallback(
     (key: string, fallback?: string): string => {
       const entry = translations[key];
       if (!entry) return fallback || key;
       return entry[language] || entry['en'] || fallback || key;
+    },
+    [language]
+  );
+
+  // Bilingual translation:
+  // If language === 'en' -> returns English only
+  // If language !== 'en' -> returns Native (English)
+  const tb = useCallback(
+    (key: string, fallbackEn?: string): string => {
+      const entry = translations[key];
+      const enVal = entry?.['en'] || fallbackEn || key;
+      if (language === 'en') return enVal;
+      const nativeVal = entry?.[language] || enVal;
+      if (nativeVal === enVal) return enVal;
+      return `${nativeVal} (${enVal})`;
     },
     [language]
   );
@@ -59,6 +77,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         language,
         setLanguage,
         t,
+        tb,
         languages: SUPPORTED_LANGUAGES,
         currentLanguageInfo,
       }}
