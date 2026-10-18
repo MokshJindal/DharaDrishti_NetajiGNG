@@ -20,7 +20,7 @@ const MapComponent = dynamic(() => import('@/components/map/MapComponent'), {
   loading: () => (
     <div className="w-full h-[540px] rounded-3xl bg-[#ECE8AF]/30 animate-pulse flex flex-col items-center justify-center text-[#186049] font-bold gap-2">
       <span className="text-3xl animate-bounce">🛰️</span>
-      <span>Loading Precision GIS Map &amp; Strava Telemetry...</span>
+      <span>Loading Precision GIS Map &amp; GPS Telemetry...</span>
     </div>
   ),
 });
@@ -95,8 +95,8 @@ const TEXTURE_PROPERTIES: Record<
 export default function FieldsPage() {
   const { t, language } = useLanguage();
 
-  // Active view tab: 'map' | 'zones' | 'vra' | 'planning' | 'survey'
-  const [activeTab, setActiveTab] = useState<'map' | 'zones' | 'vra' | 'planning' | 'survey'>('map');
+  // Active view tab: 'zones' | 'vra' | 'planning' | 'survey'
+  const [activeTab, setActiveTab] = useState<'zones' | 'vra' | 'planning' | 'survey'>('zones');
 
   // Farm field state
   const [fieldName, setFieldName] = useState<string>('Shri Ram Khet (North Farm)');
@@ -106,7 +106,7 @@ export default function FieldsPage() {
   const [selectedZoneId, setSelectedZoneId] = useState<string>('zone-01');
   const [activeLayer, setActiveLayer] = useState<MapOverlayLayer>('satellite');
 
-  // Strava tracking & simulation states
+  // GPS Boundary walk & simulation tracking states
   const [isTracking, setIsTracking] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -322,7 +322,7 @@ export default function FieldsPage() {
   );
 
   // ─────────────────────────────────────────────────────────────
-  // Strava GPS Walking Mode (No unprompted loud speech)
+  // GPS Boundary Walking Mode (Real Handheld GPS)
   // ─────────────────────────────────────────────────────────────
   const handleStartWalking = useCallback(() => {
     setIsDrawing(false);
@@ -354,13 +354,13 @@ export default function FieldsPage() {
   }, [boundary, fieldName, landUnits.bigha]);
 
   // ─────────────────────────────────────────────────────────────
-  // Strava Walk Simulation Mode (1-Click Evaluation Demo)
+  // Field Walk Simulation Mode (1-Click Evaluation Demo)
   // ─────────────────────────────────────────────────────────────
   const handleStartSimulation = useCallback(() => {
     setIsDrawing(false);
     setIsTracking(false);
     setIsSimulating(true);
-    setStatusMessage('🎮 Simulating GPS walk along Shirur field perimeter at 4.2 km/h...');
+    setStatusMessage('🎮 Simulating ridge perimeter walk along field boundary at 4.2 km/h...');
   }, []);
 
   const handleToggleDraw = useCallback(() => {
@@ -547,12 +547,13 @@ export default function FieldsPage() {
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-[#186049] tracking-tight">
-            {t('geofenceTitle', 'Boundary & Crop Geo-fencing')}
+            {t('geofenceTitle', 'Farm Geofencing & Precision Zoning')}
           </h1>
 
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl">
-            Strava-inspired boundary walk with real-time GPS telemetry, precision zoning, and
-            Variable Rate Application (VRA) for targeted water and fertilizer management.
+            {language === 'hi'
+              ? 'खेत की मेड़ पर चलकर जीपीएस से वास्तविक सीमा का नक्शा बनाएं, मिट्टी के अनुसार ज़ोन विभाजित करें और खाद व पानी की बचत करें।'
+              : 'Walk your field boundary with handheld GPS, create soil & crop management zones, and generate Variable Rate Application (VRA) prescriptions.'}
           </p>
         </div>
 
@@ -719,7 +720,7 @@ export default function FieldsPage() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          INTERACTIVE STRAVA MAP & ACTION CONTROLS
+          INTERACTIVE GIS MAP & BOUNDARY TRACING CONTROLS
       ───────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
         <MapComponent
@@ -744,7 +745,7 @@ export default function FieldsPage() {
           height="540px"
         />
 
-        {/* Strava Controller Toolbar: Live Walk, Simulate Demo, Satellite Draw */}
+        {/* Boundary Mapping Toolbar: Live GPS Walk, Simulate Demo, Satellite Draw */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Start / Stop Live GPS Walk */}
           {!isTracking ? (
@@ -771,7 +772,7 @@ export default function FieldsPage() {
             </button>
           )}
 
-          {/* Simulate Strava Walk (Indoor Evaluator Demo Mode) */}
+          {/* Simulate Field Walk (Evaluation Demo Mode) */}
           {!isSimulating ? (
             <button
               onClick={handleStartSimulation}
@@ -779,7 +780,7 @@ export default function FieldsPage() {
             >
               <span className="text-2xl">🎮</span>
               <div className="text-left">
-                <div className="leading-tight">{t('simulateWalk', 'Simulate Strava Boundary Walk')}</div>
+                <div className="leading-tight">{t('simulateWalk', 'Simulate Ridge Walk (Demo)')}</div>
                 <span className="text-[11px] text-[#ECE8AF]">1-Click demo along ridge</span>
               </div>
             </button>
@@ -829,69 +830,62 @@ export default function FieldsPage() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          SEGMENTED NAVIGATION TABS (Zoning, VRA, Crop Planning, Survey)
+          ORGANIZED PRECISION FARMING WORKFLOW TABS
       ───────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
         <button
-          onClick={() => setActiveTab('map')}
-          className={`px-4 py-2 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap ${
-            activeTab === 'map'
-              ? 'bg-[#186049] text-white shadow-md'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          📍 Map &amp; Zones
-        </button>
-
-        <button
           onClick={() => setActiveTab('zones')}
-          className={`px-4 py-2 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'zones'
               ? 'bg-[#186049] text-white shadow-md'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🌾 {t('precisionZoning', 'Precision Resource Allocation (Zoning)')}
+          <span>🌾</span>
+          <span>{t('precisionZoning', 'Precision Resource Allocation (Zoning)')}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('vra')}
-          className={`px-4 py-2 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'vra'
               ? 'bg-[#186049] text-white shadow-md'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🧪 {t('vraPrescription', 'Variable Rate Application (VRA)')}
+          <span>🧪</span>
+          <span>{t('vraPrescription', 'Variable Rate Application (VRA)')}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('planning')}
-          className={`px-4 py-2 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'planning'
               ? 'bg-[#186049] text-white shadow-md'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📅 {t('cropPlanningTab', 'Targeted Crop Planning & Harvest')}
+          <span>📅</span>
+          <span>{t('cropPlanningTab', 'Targeted Crop Planning & Harvest')}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('survey')}
-          className={`px-4 py-2 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold rounded-2xl transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'survey'
               ? 'bg-[#186049] text-white shadow-md'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📐 Cadastral Survey Coordinates
+          <span>📐</span>
+          <span>Cadastral Survey Coordinates</span>
         </button>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
           TAB CONTENT 1: MANAGEMENT ZONES & INTERACTIVE SOIL TUNING
       ───────────────────────────────────────────────────────────── */}
-      {(activeTab === 'map' || activeTab === 'zones') && (
+      {activeTab === 'zones' && (
         <div className="space-y-6">
           <div className="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100 text-xs sm:text-sm text-emerald-900 flex items-start gap-3">
             <span className="text-xl">💡</span>

@@ -518,8 +518,8 @@ export const translations: Record<string, Record<LanguageCode, string>> = {
     ml: 'കൃത്യമായ വിഭവ വിതരണം (മേഖലകൾ)',
   },
   simulateWalk: {
-    en: 'Simulate Strava Boundary Walk',
-    hi: 'सिमुलेटेड वॉक चलाएं (डेमो)',
+    en: 'Simulate Field Boundary Walk (Demo)',
+    hi: 'सिमुलेटेड मेड़ वॉक (डेमो)',
     pa: 'ਸਿਮੂਲੇਟਿਡ ਵਾਕ ਚਲਾਓ (ਡੈਮੋ)',
     ta: 'மாதிரி எல்லை நடை (டெமோ)',
     te: 'నమూనా సరిహద్దు నడక (డెమో)',

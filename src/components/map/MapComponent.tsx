@@ -116,7 +116,7 @@ export default function MapComponent({
   const [gpsAccuracy, setGpsAccuracy] = useState<number>(2.4);
   const [isNearStart, setIsNearStart] = useState<boolean>(false);
 
-  // Strava HUD Telemetry
+  // GPS Boundary HUD Telemetry
   const [distanceWalkedM, setDistanceWalkedM] = useState<number>(0);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [speedKmh, setSpeedKmh] = useState<number>(0);
@@ -465,7 +465,7 @@ export default function MapComponent({
   }, [pins]);
 
   // ─────────────────────────────────────────────────────────────
-  // Strava GPS Walking Mode (Real Handheld GPS)
+  // GPS Boundary Walking Mode (Real Handheld GPS)
   // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isTracking) {
@@ -596,7 +596,7 @@ export default function MapComponent({
   }, [isTracking]);
 
   // ─────────────────────────────────────────────────────────────
-  // Simulated Strava Walk Mode (For Demos & Evaluation)
+  // Simulated Ridge Walk Mode (For Demos & Evaluation)
   // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isSimulating) {
@@ -802,13 +802,13 @@ export default function MapComponent({
       <div ref={mapContainerRef} style={{ width: '100%', height }} className="z-0" />
 
       {/* ─────────────────────────────────────────────────────────────
-          STRAVA-LIKE TELEMETRY HEADS-UP DISPLAY (HUD)
+          GPS FIELD BOUNDARY TELEMETRY HEADS-UP DISPLAY (HUD)
           Visible when tracking or simulating walk
       ───────────────────────────────────────────────────────────── */}
       {(isTracking || isSimulating) && (
         <div className="absolute top-4 left-4 right-4 sm:left-6 sm:right-auto z-[500] pointer-events-auto">
           <div className="bg-[#0f3d2e]/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-[#ECE8AF]/40 w-full sm:w-[380px] animate-slide-up">
-            {/* Strava Header with Live Pulse */}
+            {/* GPS Telemetry Header with Live Pulse */}
             <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-3 w-3">
@@ -816,7 +816,7 @@ export default function MapComponent({
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                 </span>
                 <span className="text-xs font-black uppercase tracking-wider text-[#ECE8AF]">
-                  {isSimulating ? '🎮 Simulated Strava Walk' : '🏃 Live Strava Boundary Walk'}
+                  {isSimulating ? '🎮 Simulated Ridge Walk' : '🏃 Live GPS Boundary Walk'}
                 </span>
               </div>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
