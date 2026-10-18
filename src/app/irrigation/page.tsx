@@ -28,13 +28,34 @@ export default function IrrigationPage() {
   const [soilPh, setSoilPh] = useState(PRIMARY_FIELD.soilHealth.pH);
   const [soilOc, setSoilOc] = useState(PRIMARY_FIELD.soilHealth.organicCarbonPercent);
 
+  const [ureaApplied, setUreaApplied] = useState(false);
+  const [weatherIntel, setWeatherIntel] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadIntel() {
+      try {
+        const res = await fetch(`/api/weather/intelligence?lat=18.8262&lon=74.3731&urea_applied=${ureaApplied}&soil_n=${soilN < 280 ? 'low' : 'normal'}`);
+        const data = await res.json();
+        if (data.success) {
+          setWeatherIntel(data);
+        }
+      } catch (err) {
+        console.error('Failed to load weather intel:', err);
+      }
+    }
+    loadIntel();
+  }, [ureaApplied, soilN]);
+
   // Computed irrigation results using the deterministic engine
+  const rainTomorrow = weatherIntel?.daily?.[1]?.rainMm ?? MOCK_WEATHER_FORECAST[1].rainfallMm;
+  const et0Today = MOCK_WEATHER_FORECAST[0].et0Mm;
+
   const waterResult = calculateWaterNeed({
     crop: selectedCrop,
     stage: cropStage,
     area_acres: 3.2,
-    et0: MOCK_WEATHER_FORECAST[0].et0Mm,
-    rainfall_mm: MOCK_WEATHER_FORECAST[1].rainfallMm, // Tomorrow's rain forecast
+    et0: et0Today,
+    rainfall_mm: rainTomorrow,
     soil_type: soilType,
   });
 
@@ -50,12 +71,13 @@ export default function IrrigationPage() {
   });
 
   const speakIrrigationAdvice = useCallback(() => {
-    const text =
-      language === 'hi'
-        ? `सिंचाई सलाह: कल ${MOCK_WEATHER_FORECAST[1].rainfallMm} मिलीमीटर बारिश का अनुमान है। आज पानी बिल्कुल न लगाएं। इससे बिजली और पानी की बचत होगी और जड़ गलन नहीं होगी।`
-        : `Irrigation guidance: ${MOCK_WEATHER_FORECAST[1].rainfallMm} mm rain expected tomorrow. Skip watering today to save electricity and prevent root waterlogging.`;
+    const adv = weatherIntel?.advisory;
+    const isHi = language === 'hi';
+    const text = isHi
+      ? (adv?.summaryBannerHi || `सिंचाई सलाह: कल ${rainTomorrow} मिलीमीटर बारिश का अनुमान है। आज पानी न लगाएं।`)
+      : (adv?.summaryBanner || `Irrigation guidance: ${rainTomorrow} mm rain expected. Skip watering today to save water and prevent root waterlogging.`);
     speak(text);
-  }, [language, speak]);
+  }, [weatherIntel, rainTomorrow, language, speak]);
 
   const speakFertiliserAdvice = useCallback(() => {
     const text =
@@ -167,29 +189,63 @@ export default function IrrigationPage() {
       {/* ─────────────────── TAB 1: IRRIGATION ─────────────────── */}
       {activeTab === 'irrigation' && (
         <div className="space-y-5">
-          {/* Smart Decision Banner */}
+          {/* Smart Decision Banner from Weather_Logic */}
           <div className="rounded-3xl bg-gradient-to-r from-[#ECE8AF] to-[#fff4c2] p-6 text-[#186049] shadow-md border-2 border-[#B98327]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
-              <span className="text-4xl">🛑</span>
+              <span className="text-4xl">
+                {weatherIntel?.advisory?.status === 'HOLD' ? '🛑' : weatherIntel?.advisory?.status === 'SWITCH_METHOD' ? '⚠️' : '💧'}
+              </span>
               <div>
-                <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-[#B98327] text-white">
-                  Decision Today: SKIP WATERING
-                </span>
-                <h3 className="text-xl font-black text-[#186049] mt-1">
-                  {t('skipWateringReason', 'Do not water today. Rain expected in 24 hours — saves power & prevents root rot.')}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-extrabold uppercase px-2.5 py-0.5 rounded bg-[#B98327] text-white">
+                    {weatherIntel?.advisory?.status || 'HOLD_OR_IRRIGATE'}
+                  </span>
+                  {weatherIntel?.advisory?.leachingVulnerabilityIndex && (
+                    <span
+                      className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                        weatherIntel.advisory.leachingVulnerabilityIndex.level === 'CRITICAL'
+                          ? 'bg-red-600 text-white'
+                          : weatherIntel.advisory.leachingVulnerabilityIndex.level === 'HIGH'
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-emerald-700 text-white'
+                      }`}
+                    >
+                      Leaching Risk: {weatherIntel.advisory.leachingVulnerabilityIndex.lvi}/100 ({weatherIntel.advisory.leachingVulnerabilityIndex.level})
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-lg font-black text-[#186049] mt-1.5">
+                  {language === 'hi'
+                    ? (weatherIntel?.advisory?.summaryBannerHi || 'सिंचाई सलाह: मौसम और वाष्पोत्सर्जन के अनुसार सिंचाई का निर्णय लें।')
+                    : (weatherIntel?.advisory?.summaryBanner || 'Smart irrigation decision based on live Open-Meteo & ICAR logic.')}
                 </h3>
+
                 <p className="text-xs text-gray-700 mt-1">
-                  Tomorrow&apos;s rain: <b>18 mm</b> • Crop Evapotranspiration: <b>4.8 mm</b> • Net Soil Balance: <b>+13.2 mm surplus</b>
+                  Rain Expected: <b>{rainTomorrow} mm</b> • ET₀ Demand: <b>{et0Today} mm</b> • Daily Crop Need: <b>{waterResult.daily_mm} mm</b>
                 </p>
+
+                {/* Urea Applied Toggle for dynamic LVI simulation */}
+                <div className="mt-2 flex items-center gap-2">
+                  <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={ureaApplied}
+                      onChange={(e) => setUreaApplied(e.target.checked)}
+                      className="accent-[#186049] rounded cursor-pointer"
+                    />
+                    <span>{language === 'hi' ? 'क्या आपने हाल ही में यूरिया/खाद डाली है?' : 'Recently applied Urea fertilizer (Nitrate leaching check)?'}</span>
+                  </label>
+                </div>
               </div>
             </div>
 
             <button
               onClick={speakIrrigationAdvice}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#186049] text-white font-bold text-xs shadow hover:bg-[#124b39] transition whitespace-nowrap"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#186049] text-white font-bold text-xs shadow hover:bg-[#124b39] transition whitespace-nowrap self-start md:self-auto"
             >
               <span>🔊</span>
-              <span>Listen</span>
+              <span>{language === 'hi' ? 'सलाह सुनें' : 'Listen'}</span>
             </button>
           </div>
 

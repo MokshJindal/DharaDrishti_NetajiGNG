@@ -43,11 +43,11 @@ class WeatherConfig:
         "HISTORICAL_API_URL", "https://api.open-meteo.com/v1/forecast"
     )
     api_key: str = os.getenv("WEATHER_API_KEY", "")
-    default_latitude: float = float(os.getenv("DEFAULT_LATITUDE", "52.52"))
-    default_longitude: float = float(os.getenv("DEFAULT_LONGITUDE", "13.41"))
-    default_location_name: str = os.getenv("DEFAULT_LOCATION_NAME", "Berlin")
+    default_latitude: float = float(os.getenv("DEFAULT_LATITUDE", "18.8262"))
+    default_longitude: float = float(os.getenv("DEFAULT_LONGITUDE", "74.3731"))
+    default_location_name: str = os.getenv("DEFAULT_LOCATION_NAME", "Shirur, Pune, Maharashtra")
     historical_days: int = int(os.getenv("HISTORICAL_DAYS", "10"))
-    timezone: str = os.getenv("TIMEZONE", "auto")
+    timezone: str = os.getenv("TIMEZONE", "Asia/Kolkata")
     timeout_seconds: int = int(os.getenv("REQUEST_TIMEOUT_SECONDS", "10"))
 
     def validate(self) -> None:
