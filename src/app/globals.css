@@ -82,6 +82,14 @@ body {
   animation: voicePulse 2s infinite ease-in-out;
 }
 
+/* Topographic Contour Background Pattern for Hero */
+.bg-topo-pattern {
+  background-image: 
+    radial-gradient(ellipse at 50% 20%, rgba(74, 148, 62, 0.25) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(185, 131, 39, 0.15) 0%, transparent 40%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 2px, transparent 2px, transparent 16px);
+}
+
 /* Leaflet Map Tooltips styling */
 .leaflet-tooltip.map-tooltip-clean {
   background-color: #186049 !important;
