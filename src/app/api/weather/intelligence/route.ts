@@ -121,8 +121,15 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const lat = parseFloat(searchParams.get('lat') || '18.8262'); // Shirur, Pune, MH default
     const lon = parseFloat(searchParams.get('lon') || '74.3731');
+    const locationName = searchParams.get('location_name') || 'Shirur, Pune (Maharashtra)';
     const ureaApplied = searchParams.get('urea_applied') === 'true';
     const soilN = searchParams.get('soil_n') || 'normal';
+
+    // Optional simulation overrides (e.g. from farmer condition testing slider)
+    const overrideTemp = searchParams.get('temp') ? parseFloat(searchParams.get('temp')!) : null;
+    const overrideRain = searchParams.get('rain') ? parseFloat(searchParams.get('rain')!) : null;
+    const overrideHumidity = searchParams.get('humidity') ? parseFloat(searchParams.get('humidity')!) : null;
+    const overrideWind = searchParams.get('wind') ? parseFloat(searchParams.get('wind')!) : null;
 
     const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,cloud_cover,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=Asia%2FKolkata&forecast_days=7&past_days=3`;
 
@@ -140,10 +147,21 @@ export async function GET(request: Request) {
     let currentIdx = hourly.time?.findIndex((t: string) => t.startsWith(nowIso)) ?? 0;
     if (currentIdx === -1) currentIdx = 72; // default after 3 past days
 
-    const currentTemp = hourly.temperature_2m?.[currentIdx] ?? 28;
-    const currentHumidity = hourly.relative_humidity_2m?.[currentIdx] ?? 65;
-    const currentWeatherCode = hourly.weather_code?.[currentIdx] ?? 0;
-    const currentWindSpeed = hourly.wind_speed_10m?.[currentIdx] ?? 10;
+    // Apply simulation overrides if present
+    const currentTemp = overrideTemp !== null ? overrideTemp : (hourly.temperature_2m?.[currentIdx] ?? 28);
+    const currentHumidity = overrideHumidity !== null ? overrideHumidity : (hourly.relative_humidity_2m?.[currentIdx] ?? 65);
+    const currentWindSpeed = overrideWind !== null ? overrideWind : (hourly.wind_speed_10m?.[currentIdx] ?? 10);
+    
+    // Compute weather code dynamically based on rain/humidity
+    let currentWeatherCode = hourly.weather_code?.[currentIdx] ?? 0;
+    if (overrideRain !== null) {
+      if (overrideRain > 25) currentWeatherCode = 65; // Heavy rain
+      else if (overrideRain > 5) currentWeatherCode = 63; // Moderate rain
+      else if (overrideRain > 0.5) currentWeatherCode = 61; // Slight rain
+      else if (currentHumidity > 80) currentWeatherCode = 3; // Overcast
+      else currentWeatherCode = 0; // Clear
+    }
+
     const weatherMeta = WMO_CODES[currentWeatherCode] || {
       description: 'Partly cloudy',
       hindi: 'आंशिक बादल',
@@ -153,16 +171,21 @@ export async function GET(request: Request) {
     // Next 48 hours for rain leaching
     const next48Precip = hourly.precipitation?.slice(currentIdx, currentIdx + 48) || [];
     const next48Prob = hourly.precipitation_probability?.slice(currentIdx, currentIdx + 48) || [];
-    const totalPrecip48 = Math.round(next48Precip.reduce((a: number, b: number) => a + b, 0) * 10) / 10;
-    const maxRainProb48 = Math.max(...(next48Prob.length ? next48Prob : [0]));
+    let totalPrecip48 = Math.round(next48Precip.reduce((a: number, b: number) => a + b, 0) * 10) / 10;
+    let maxRainProb48 = Math.max(...(next48Prob.length ? next48Prob : [0]));
+
+    if (overrideRain !== null) {
+      totalPrecip48 = overrideRain;
+      maxRainProb48 = overrideRain > 0 ? Math.min(100, Math.round(overrideRain * 4 + 40)) : 5;
+    }
 
     // 72 hour window for fungal disease evaluation
     const next72Hours = [];
     for (let i = currentIdx; i < Math.min(hourly.time?.length || 0, currentIdx + 72); i++) {
       next72Hours.push({
-        humidity: hourly.relative_humidity_2m?.[i] ?? 60,
+        humidity: overrideHumidity !== null ? overrideHumidity : (hourly.relative_humidity_2m?.[i] ?? 60),
         cloudCover: hourly.cloud_cover?.[i] ?? 20,
-        weatherCode: hourly.weather_code?.[i] ?? 0,
+        weatherCode: overrideRain !== null && overrideRain > 5 ? 63 : (hourly.weather_code?.[i] ?? 0),
       });
     }
 
@@ -214,7 +237,7 @@ export async function GET(request: Request) {
       location: {
         latitude: lat,
         longitude: lon,
-        name: lat === 18.8262 ? 'Shirur, Pune, Maharashtra' : `${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+        name: locationName || (lat === 18.8262 ? 'Shirur, Pune (Maharashtra)' : `${lat.toFixed(3)}°N, ${lon.toFixed(3)}°E`),
       },
       current: {
         temperature: currentTemp,
