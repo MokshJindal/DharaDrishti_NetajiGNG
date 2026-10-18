@@ -210,7 +210,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // 3. Fast Direct Navigation Intents
+      // 3. Fast Direct Navigation Intents & Synonyms
       // Geofencing / Fields
       if (
         lower.includes('field') ||
@@ -220,7 +220,17 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         lower.includes('boundary') ||
         lower.includes('सीमा') ||
         lower.includes('walk') ||
-        lower.includes('ਪਲਾਟ')
+        lower.includes('ਚਲੋ') ||
+        lower.includes('ਪਲਾਟ') ||
+        lower.includes('plot') ||
+        lower.includes('zameen') ||
+        lower.includes('जमीन') ||
+        lower.includes('रकबा') ||
+        lower.includes('naap') ||
+        lower.includes('नापो') ||
+        lower.includes('मेड़') ||
+        lower.includes('med') ||
+        lower.includes('gps')
       ) {
         router.push('/fields');
         const reply =
@@ -234,7 +244,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Disease Detection
+      // Disease Detection / Crop Doctor
       if (
         lower.includes('disease') ||
         lower.includes('bimar') ||
@@ -242,11 +252,24 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         lower.includes('रोग') ||
         lower.includes('पत्ती') ||
         lower.includes('कीड़ा') ||
+        lower.includes('कीट') ||
         lower.includes('leaf') ||
         lower.includes('spray') ||
         lower.includes('diagnose') ||
         lower.includes('camera') ||
-        lower.includes('डॉक्टर')
+        lower.includes('डॉक्टर') ||
+        lower.includes('doctor') ||
+        lower.includes('patta') ||
+        lower.includes('पत्ता') ||
+        lower.includes('chhidkaw') ||
+        lower.includes('छिड़काव') ||
+        lower.includes('dawa') ||
+        lower.includes('दवा') ||
+        lower.includes('ilaj') ||
+        lower.includes('इलाज') ||
+        lower.includes('fungus') ||
+        lower.includes('peela') ||
+        lower.includes('पीला')
       ) {
         router.push('/diagnose');
         const reply =
@@ -258,15 +281,23 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Irrigation / Water
+      // Irrigation / Water Advisory
       if (
         lower.includes('water') ||
         lower.includes('pani') ||
         lower.includes('पानी') ||
         lower.includes('सिंचाई') ||
+        lower.includes('sinchai') ||
         lower.includes('irrigate') ||
         lower.includes('rain') ||
-        lower.includes('ट्यूबवेल')
+        lower.includes('ट्यूबवेल') ||
+        lower.includes('tubewell') ||
+        lower.includes('motor') ||
+        lower.includes('मोटर') ||
+        lower.includes('nami') ||
+        lower.includes('नमी') ||
+        lower.includes('jal') ||
+        lower.includes('जल')
       ) {
         router.push('/irrigation');
         const reply =
@@ -278,7 +309,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Fertiliser / Khad
+      // Fertiliser / Khad / Soil Health
       if (
         lower.includes('fertiliser') ||
         lower.includes('fertilizer') ||
@@ -288,7 +319,13 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         lower.includes('यूरिया') ||
         lower.includes('dap') ||
         lower.includes('mitti') ||
-        lower.includes('मिट्टी')
+        lower.includes('मिट्टी') ||
+        lower.includes('soil') ||
+        lower.includes('npk') ||
+        lower.includes('potash') ||
+        lower.includes('पोटाश') ||
+        lower.includes('poshan') ||
+        lower.includes('पोषण')
       ) {
         router.push('/irrigation');
         const reply =
@@ -300,19 +337,30 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Profit / Mandi
+      // Profit / APMC Mandi Rates / Selling
       if (
         lower.includes('profit') ||
         lower.includes('earn') ||
         lower.includes('munafa') ||
         lower.includes('मुनाफा') ||
         lower.includes('कमाई') ||
+        lower.includes('kamai') ||
         lower.includes('mandi') ||
         lower.includes('मंडी') ||
         lower.includes('price') ||
         lower.includes('भाव') ||
+        lower.includes('bhav') ||
         lower.includes('rate') ||
-        lower.includes('रेट')
+        lower.includes('रेट') ||
+        lower.includes('apmc') ||
+        lower.includes('daam') ||
+        lower.includes('दाम') ||
+        lower.includes('kimat') ||
+        lower.includes('कीमत') ||
+        lower.includes('bechna') ||
+        lower.includes('बेचना') ||
+        lower.includes('market') ||
+        lower.includes('बाजार')
       ) {
         router.push('/profit');
         const reply =
@@ -324,14 +372,21 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Weather
+      // Weather / Monsoon Radar
       if (
         lower.includes('weather') ||
         lower.includes('mausam') ||
         lower.includes('मौसम') ||
         lower.includes('barish') ||
         lower.includes('बारिश') ||
-        lower.includes('forecast')
+        lower.includes('forecast') ||
+        lower.includes('hawa') ||
+        lower.includes('हवा') ||
+        lower.includes('temperature') ||
+        lower.includes('taapman') ||
+        lower.includes('तापमान') ||
+        lower.includes('toofan') ||
+        lower.includes('तूफान')
       ) {
         router.push('/weather');
         const reply =
@@ -343,7 +398,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Fasal Score
+      // Fasal Score / Kisan Credit / Land Health
       if (
         lower.includes('score') ||
         lower.includes('health') ||
@@ -351,7 +406,19 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         lower.includes('हाल') ||
         lower.includes('kisan score') ||
         lower.includes('loan') ||
-        lower.includes('लोन')
+        lower.includes('लोन') ||
+        lower.includes('kcc') ||
+        lower.includes('credit') ||
+        lower.includes('साख') ||
+        lower.includes('patrata') ||
+        lower.includes('पात्रता') ||
+        lower.includes('eligibility') ||
+        lower.includes('sehat') ||
+        lower.includes('सेहत') ||
+        lower.includes('rating') ||
+        lower.includes('ledger') ||
+        lower.includes('bahi') ||
+        lower.includes('बही')
       ) {
         router.push('/score');
         const reply =
