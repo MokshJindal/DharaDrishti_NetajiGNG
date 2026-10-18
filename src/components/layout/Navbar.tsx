@@ -113,7 +113,18 @@ export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle?: ()
               </button>
             </div>
 
-            {/* 10-Language Dropdown (Clean Script Badges, Zero ?? chars) */}
+            {/* 1-Click Quick Toggle: EN | हिंदी (JanSetu style) */}
+            <button
+              onClick={() => setLanguage(language === 'hi' ? 'en' : 'hi')}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-xs font-bold text-[#186049] hover:bg-emerald-50 transition shadow-xs active:scale-95"
+              title="Toggle English / हिंदी"
+            >
+              <span className={language === 'en' ? 'text-[#186049] font-black underline' : 'text-gray-500'}>EN</span>
+              <span className="text-gray-300">|</span>
+              <span className={language === 'hi' ? 'text-[#186049] font-black underline' : 'text-gray-500'}>हिंदी</span>
+            </button>
+
+            {/* 10-Language Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowLangMenu((v) => !v)}

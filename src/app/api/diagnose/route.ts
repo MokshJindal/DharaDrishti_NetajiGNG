@@ -64,11 +64,23 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
-    // Detect media type and strip base64 prefix if present
+    // Handle both remote image URLs (demo leaves) and data URLs (camera/file uploads)
     let mediaType = 'image/jpeg';
     let base64Data = image;
 
-    if (image.includes(';base64,')) {
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      try {
+        const imgRes = await fetch(image);
+        if (imgRes.ok) {
+          const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+          mediaType = contentType.split(';')[0];
+          const arrayBuffer = await imgRes.arrayBuffer();
+          base64Data = Buffer.from(arrayBuffer).toString('base64');
+        }
+      } catch (e) {
+        console.warn('Failed to fetch image URL for diagnosis:', e);
+      }
+    } else if (image.includes(';base64,')) {
       const parts = image.split(';base64,');
       const mimeMatch = parts[0].match(/:(.*?)$/);
       if (mimeMatch) {
