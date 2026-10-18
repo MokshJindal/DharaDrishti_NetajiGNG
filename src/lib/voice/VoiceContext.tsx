@@ -189,13 +189,36 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       const targetLang = (langOverride || language) as LanguageCode;
       stopSpeaking();
 
+      // Helper to strip markdown and format clean spoken text
+      const cleanSpeechText = (raw: string) => {
+        return raw
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/`([^`]+)`/g, '$1')
+          .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
+          .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+          .replace(/^#{1,6}\s+/gm, '')
+          .replace(/\*\*([^*]+)\*\*/g, '$1')
+          .replace(/\*([^*]+)\*/g, '$1')
+          .replace(/^[\s]*[-*+]\s+/gm, '')
+          .replace(/^[\s]*\d+\.\s+/gm, '')
+          .replace(/^>\s+/gm, '')
+          .replace(/---/g, '')
+          .replace(/\|/g, ' ')
+          .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      };
+
+      const cleaned = cleanSpeechText(text);
+      if (!cleaned) return;
+
       // 1. Try Server Next.js API Route (/api/voice/tts)
       try {
         const response = await fetch('/api/voice/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            text,
+            text: cleaned,
             language: targetLang,
           }),
         });
@@ -225,9 +248,23 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         console.warn('Server TTS route unavailable, attempting direct Sarvam client call:', err);
       }
 
-      // 1b. Direct Client-Side Sarvam AI Call (Ensures natural Indian voice even on Vercel preview)
+      // 1b. Direct Client-Side Sarvam AI Call (Ensures natural Indian conversational voice)
       try {
         const sarvamKey = 'sk_gops1gpv_0TsSugHiLB2ngNV5dduefdX8';
+        const v4Speakers: Record<string, string> = {
+          hi: 'aditya_hi_conversational',
+          en: 'amelia_en_conversational',
+          pa: 'anand_pa_conversation',
+          mr: 'ishita_mr_conversational',
+          gu: 'bhavik_gu_conversation',
+          bn: 'arnab_bn_conversation',
+          ta: 'gokul_ta_narration',
+          te: 'kavitha_te_conversation',
+          kn: 'chaitra_kn_conversation',
+        };
+
+        const targetSpeaker = v4Speakers[targetLang] || 'aditya_hi_conversational';
+
         const directRes = await fetch('https://api.sarvam.ai/text-to-speech', {
           method: 'POST',
           headers: {
@@ -235,10 +272,11 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
             'api-subscription-key': sarvamKey,
           },
           body: JSON.stringify({
-            inputs: [text.trim()],
-            target_language_code: BCP47_MAP[targetLang] || 'en-IN',
-            speaker: 'aditya',
-            model: 'bulbul:v3',
+            inputs: [cleaned.slice(0, 350)],
+            target_language_code: BCP47_MAP[targetLang] || 'hi-IN',
+            speaker: targetSpeaker,
+            model: 'bulbul:v4-flash',
+            pace: 1.0,
           }),
         });
 
