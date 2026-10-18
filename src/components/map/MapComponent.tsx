@@ -72,6 +72,8 @@ interface MapComponentProps {
     pointsCount: number;
     isNearStart: boolean;
   }) => void;
+  selectedZoneId?: string;
+  onSelectZone?: (id: string) => void;
   height?: string;
 }
 
@@ -89,6 +91,8 @@ export default function MapComponent({
   onBoundaryUpdate,
   onFinishWalk,
   onStatsUpdate,
+  selectedZoneId,
+  onSelectZone,
   height = '540px',
 }: MapComponentProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -406,16 +410,21 @@ export default function MapComponent({
     if (currentLayer === 'satellite' || currentLayer === 'street') {
       subAreas.forEach((sub) => {
         if (sub.polygon.length >= 3) {
+          const isSelected = selectedZoneId === sub.id;
           const poly = L.polygon(sub.polygon, {
-            color: sub.color,
-            fillColor: sub.color,
-            fillOpacity: 0.45,
-            weight: 2,
+            color: isSelected ? '#F59E0B' : sub.color,
+            fillColor: isSelected ? '#F59E0B' : sub.color,
+            fillOpacity: isSelected ? 0.65 : 0.40,
+            weight: isSelected ? 4 : 2,
           }).addTo(map);
+
+          poly.on('click', () => {
+            onSelectZone?.(sub.id);
+          });
 
           const subAcres = calculateArea(sub.polygon);
           poly.bindTooltip(
-            `<b>${sub.name}</b><br/>${sub.crop} (${subAcres.toFixed(1)} ac • ${sub.soil?.texture || 'Loam'})`,
+            `<b>${sub.name}</b><br/>${sub.crop} (${subAcres.toFixed(1)} ac • ${sub.soil?.texture || 'Loam'})${isSelected ? ' <span style="color:#ECE8AF;">● Selected</span>' : ''}`,
             { permanent: true, direction: 'center', className: 'map-tooltip-clean' }
           );
 
@@ -423,7 +432,7 @@ export default function MapComponent({
         }
       });
     }
-  }, [currentLayer, subAreas]);
+  }, [currentLayer, onSelectZone, selectedZoneId, subAreas]);
 
   // Render Disease / Health Alert Pins
   useEffect(() => {

@@ -256,21 +256,30 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       // 2. Client-side SpeechSynthesis Fallback
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(cleanText);
         const bcpCode = BCP47_MAP[targetLang] || 'en-IN';
-        utterance.lang = bcpCode;
-
         const voices = window.speechSynthesis.getVoices();
+
+        // STRICT MATCH: Only speak with browser synthesis if a voice matching this language is actually installed
         const matched = voices.find(
           (v) =>
             v.lang === bcpCode ||
-            v.lang.toLowerCase().includes(targetLang) ||
-            v.name.toLowerCase().includes('hindi') ||
-            v.name.toLowerCase().includes('india')
+            v.lang.toLowerCase().startsWith(targetLang.toLowerCase()) ||
+            v.name.toLowerCase().includes(targetLang === 'hi' ? 'hindi' : targetLang)
         );
+
+        // If target is non-English and NO native voice exists on this OS, do NOT speak with an English voice
+        // This prevents the bizarre, distorted metallic robotic voice when English engines try to pronounce Hindi
+        if (!matched && targetLang !== 'en') {
+          console.warn(`[TTS] No native ${targetLang} voice installed in browser. Skipping robotic English fallback.`);
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = matched?.lang || (targetLang === 'en' ? 'en-IN' : bcpCode);
         if (matched) utterance.voice = matched;
 
         utterance.rate = 1.0;
+        utterance.pitch = 1.0;
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => setIsSpeaking(false);
         utterance.onerror = () => setIsSpeaking(false);
@@ -404,15 +413,14 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         setIsProcessing(false);
       }
 
-      // Friendly Fallback
+      // Friendly Fallback - show visual feedback without unprompted loud speech
       const genericReply =
         language === 'en'
-          ? `Heard: "${text}". Opening requested feature.`
-          : `मैंने सुना: "${text}"। आदेश खोला जा रहा है।`;
-      speak(genericReply);
+          ? `Heard: "${text}".`
+          : `सुना गया: "${text}"`;
       setLastAction({ intent: 'generic', feedback: genericReply });
     },
-    [language, router, speak]
+    [language, router]
   );
 
   // Initialize Speech Recognition once
